@@ -167,4 +167,76 @@ public class DummyBOWithParams {{
 
         return TestHelper.Verify(cslaSource);
     }
+
+    [Fact]
+    public Task ParameterWithGenericArity1() {
+        var cslaSource = $@"
+using Csla;
+using System.Collections.Generic;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    public void Bar(IEnumerable<Guid> krznbf) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource);
+    }
+
+    [Fact]
+    public Task NullableEnumParameter() {
+        var cslaSource = $@"
+using Csla;
+using TestEnum;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    public void Bar(SomeEnum? krznbf) {{
+    }}
+}}
+";
+
+        var someEnumSource = $@"
+namespace TestEnum;
+
+public enum SomeEnum {{
+    None = 0,
+    Some = 1
+}}
+";
+
+        return TestHelper.Verify(cslaSource, someEnumSource);
+    }
+
+    [Fact]
+    public Task EnumParameter() {
+        var cslaSource = $@"
+using Csla;
+using TestEnum;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    public void Bar(SomeEnum krznbf) {{
+    }}
+}}
+";
+
+        var someEnumSource = $@"
+namespace TestEnum;
+
+public enum SomeEnum {{
+    None = 0,
+    Some = 1
+}}
+";
+
+        return TestHelper.Verify(cslaSource, someEnumSource);
+    }
 }
