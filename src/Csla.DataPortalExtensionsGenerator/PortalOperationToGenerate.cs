@@ -1,0 +1,18 @@
+﻿namespace Ossendorf.Csla.DataPortalExtensionsGenerator;
+
+internal readonly record struct PortalOperationToGenerate {
+
+    public readonly string MethodName;
+    public readonly EquatableArray<OperationParameter> Parameters;
+    public readonly bool HasNullableEnabled;
+    public readonly DataPortalMethod PortalMethod;
+    public readonly PortalObject Object;
+
+    public PortalOperationToGenerate(string methodName, EquatableArray<OperationParameter> parameters, bool hasNullableEnabled, DataPortalMethod portalMethod, PortalObject @object) {
+        MethodName = methodName;
+        Parameters = parameters;
+        HasNullableEnabled = hasNullableEnabled;
+        PortalMethod = portalMethod;
+        Object = @object;
+    }
+}

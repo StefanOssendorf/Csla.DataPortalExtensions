@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Company></Company>
+        <Authors>Stefan Ossendorf</Authors>
+        <Copyright>© $([System.DateTime]::Now.ToString(yyyy)) $(Authors)</Copyright>
+        <Version>0.0.1-pre02</Version>
+    </PropertyGroup>
+</Project>

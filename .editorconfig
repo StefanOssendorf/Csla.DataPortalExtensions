@@ -279,3 +279,7 @@ dotnet_style_qualification_for_field = false:silent
 dotnet_style_qualification_for_property = false:warning
 dotnet_style_qualification_for_method = false:warning
 dotnet_style_qualification_for_event = false:warning
+
+dotnet_diagnostic.IDE2001.severity = none
+# IDE0058: Expression value is never used
+dotnet_diagnostic.IDE0058.severity = none
