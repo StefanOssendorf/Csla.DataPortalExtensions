@@ -129,11 +129,11 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
                 continue;
             }
 
-            if (semanticModel.GetTypeInfo(parameter.Type).Type is not INamedTypeSymbol parameterTypeSymbol) {
+            if (semanticModel.GetTypeInfo(parameter.Type).Type is not ITypeSymbol parameterTypeSymbol) {
                 continue;
             }
 
-            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace.ToString(), parameter.Identifier.ToString(), FormatForParameterUsage(parameter, parameterTypeSymbol)));
+            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), FormatForParameterUsage(parameter, parameterTypeSymbol)));
         }
 
         return new EquatableArray<OperationParameter>([.. foundParameters]);
@@ -155,37 +155,52 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
         }
     }
 
-    private static string FormatForParameterUsage(ParameterSyntax parameter, INamedTypeSymbol parameterTypeSymbol) {
+    private static string FormatForParameterUsage(ParameterSyntax parameter, ITypeSymbol parameterTypeSymbol) {
         var typeString = parameterTypeSymbol.ToString();
         switch (typeString) {
             case "string":
+            case "string[]":
             case "bool":
+            case "bool[]":
             case "bool?":
             case "byte":
+            case "byte[]":
             case "byte?":
             case "sbyte":
+            case "sbyte[]":
             case "sbyte?":
             case "char":
+            case "char[]":
             case "char?":
             case "decimal":
+            case "decimal[]":
             case "decimal?":
             case "double":
+            case "double[]":
             case "double?":
             case "float":
+            case "float[]":
             case "float?":
             case "int":
+            case "int[]":
             case "int?":
             case "uint":
+            case "uint[]":
             case "uint?":
             case "long":
+            case "long[]":
             case "long?":
             case "ulong":
+            case "ulong[]":
             case "ulong?":
             case "short":
+            case "short[]":
             case "short?":
             case "ushort":
+            case "ushort[]":
             case "ushort?":
             case "object":
+            case "object[]":
                 return parameter.ToString();
         }
 

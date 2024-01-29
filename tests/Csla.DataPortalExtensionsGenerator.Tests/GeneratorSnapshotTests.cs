@@ -151,8 +151,9 @@ public class DummyBOWithParams {{
         return TestHelper.Verify(cslaSource);
     }
 
-    [Fact]
-    public Task NullablePrimitveParameter() {
+    [Theory]
+    [MemberData(nameof(CSharpBuiltInTypesNullable))]
+    public Task NullablePrimitveParameter(string type) {
         var cslaSource = $@"
 using Csla;
 
@@ -160,12 +161,12 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? krznbf) {{
+    public void Bar({type}? krznbf) {{
     }}
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
     }
 
     [Fact]
@@ -239,4 +240,28 @@ public enum SomeEnum {{
 
         return TestHelper.Verify(cslaSource, someEnumSource);
     }
+
+    [Theory]
+    [MemberData(nameof(CSharpBuiltInTypes))]
+    public Task ArrayOfBuiltInTypes(string type) {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    public void Bar({type}[] krznbf) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
+    }
+
+    public static TheoryData<string> CSharpBuiltInTypes => new(_csharpBuiltInTypes);
+
+    public static TheoryData<string> CSharpBuiltInTypesNullable => new(_csharpBuiltInTypes.Where(t => t is not "string" and not "object"));
+
+    private static readonly string[] _csharpBuiltInTypes = ["string", "bool", "byte", "sbyte", "char", "decimal", "double", "float", "int", "uint", "long", "ulong", "short", "ushort", "object"];
 }
