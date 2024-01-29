@@ -31,15 +31,18 @@ namespace GeneratorTests {{
             syntaxTrees.Add(CSharpSyntaxTree.ParseText(additionalSource));
         }
 
+        var references = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
+            .Select(a => MetadataReference.CreateFromFile(a.Location))
+            .Concat(new[] {
+                MetadataReference.CreateFromFile(typeof(FetchAttribute).Assembly.Location)
+            });
+
         var compilation = CSharpCompilation.Create(
-                assemblyName: "Tests",
+                assemblyName: "GeneratorTests",
                 syntaxTrees: syntaxTrees,
-                references: new[] {
-                    MetadataReference.CreateFromFile(typeof(FetchAttribute).Assembly.Location),
-                    Basic.Reference.Assemblies.Net70.References.SystemRuntime,
-                    Basic.Reference.Assemblies.Net70.References.SystemCore
-                }
-                , new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                references: references,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
         var generator = new DataPortalExtensionsGenerator();
