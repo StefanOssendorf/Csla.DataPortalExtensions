@@ -69,6 +69,7 @@ namespace Ossendorf.Csla.DataPortalExtensionsGenerator {{
                     .Append("(").Append(arguments).Append(");").AppendLine();
             }
         }
+
         return sb;
 
         static bool IsChildMethod(DataPortalMethod portalMethod) {
