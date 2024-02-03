@@ -129,7 +129,7 @@ csharp_style_prefer_tuple_swap = true:warning
 csharp_style_prefer_utf8_string_literals = true:suggestion
 csharp_style_throw_expression = true:warning
 csharp_style_unused_value_assignment_preference = discard_variable:warning
-csharp_style_unused_value_expression_statement_preference = discard_variable:warning
+csharp_style_unused_value_expression_statement_preference = discard_variable
 
 # 'using' directive preferences
 csharp_using_directive_placement = outside_namespace:error
@@ -139,7 +139,7 @@ csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimenta
 csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = false:warning
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true:silent
 csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false:warning
-csharp_style_allow_embedded_statements_on_same_line_experimental = false:warning
+csharp_style_allow_embedded_statements_on_same_line_experimental = false
 
 #### C# Formatting Rules ####
 
@@ -200,6 +200,10 @@ dotnet_naming_rule.types_should_be_pascal_case.severity = error
 dotnet_naming_rule.types_should_be_pascal_case.symbols = types
 dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
 
+dotnet_naming_rule.consts_should_be_pascal_case.severity = error
+dotnet_naming_rule.consts_should_be_pascal_case.symbols = consts
+dotnet_naming_rule.consts_should_be_pascal_case.style = pascal_case
+
 dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = suggestion
 dotnet_naming_rule.non_field_members_should_be_pascal_case.symbols = non_field_members
 dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
@@ -225,6 +229,10 @@ dotnet_naming_symbols.non_field_members.required_modifiers =
 dotnet_naming_symbols.private_field.applicable_kinds = field
 dotnet_naming_symbols.private_field.applicable_accessibilities = private
 dotnet_naming_symbols.private_field.required_modifiers = 
+
+dotnet_naming_symbols.consts.applicable_kinds = field
+dotnet_naming_symbols.consts.applicable_accessibilities = *
+dotnet_naming_symbols.consts.required_modifiers = const
 
 # Naming styles
 
@@ -282,4 +290,4 @@ dotnet_style_qualification_for_event = false:warning
 
 dotnet_diagnostic.IDE2001.severity = none
 # IDE0058: Expression value is never used
-dotnet_diagnostic.IDE0058.severity = none
+#dotnet_diagnostic.IDE0058.severity = none
