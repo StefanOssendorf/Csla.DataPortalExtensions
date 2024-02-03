@@ -25,23 +25,23 @@ Your business object:
 namespace MyNamespace;
 
 public class Address : BusinessBase<Address> {
-	[Create]
-	private void CreateLocally() {
-		// creation logic
-	}
+    [Create]
+    private void CreateLocally() {
+        // creation logic
+    }
 
-	[Fetch]
-	private async Task FetchById(Guid id) {
-		// fetch logic
-	}
+    [Fetch]
+    private async Task ById(Guid id) {
+        // fetch logic
+    }
 }
 ```
 
 This will generate the following code:
 ```csharp
 static partial class DataPortalExtensions {
-	public static global::System.Threading.Tasks.Task<global::MyNamespace.Address> CreateLocally(this global::Csla.IDataPortal<global::MyNamespace.Address> portal) => portal.CreateAsync();
-	public static global::System.Threading.Tasks.Task<global::MyNamespace.Address> FetchById(this global::Csla.IDataPortal<global::MyNamespace.Address> portal, global::System.Guid id) => portal.FetchAsync(id);
+    public static global::System.Threading.Tasks.Task<global::MyNamespace.Address> CreateLocally(this global::Csla.IDataPortal<global::MyNamespace.Address> portal) => portal.CreateAsync();
+    public static global::System.Threading.Tasks.Task<global::MyNamespace.Address> ById(this global::Csla.IDataPortal<global::MyNamespace.Address> portal, global::System.Guid id) => portal.FetchAsync(id);
 }
 ```
 
@@ -51,3 +51,9 @@ static partial class DataPortalExtensions {
 - Support for generic business objects
 - Support for parameters with generics arity > 1
 - Improve handling of csla method parameters which are `internal` and not available
+- Add configurability
+  - Add attribute as prefix/suffix: 
+    - `ById(id)` -> `FetchById(id)`
+    - `ById(id)` -> `ByIdFetch(id)`
+  - Exclude non-public business objects from generation
+  - Exclude methods with non-public parameter types
