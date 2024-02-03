@@ -7,7 +7,7 @@ namespace Ossendorf.Csla.DataPortalExtensionsGenerator.Tests;
 
 internal class TestHelper {
 
-    private const string _classToGenerateExtensionsInto = @$"
+    private const string ClassToGenerateExtensionsInto = @$"
 namespace GeneratorTests {{
     [{GeneratorHelper.FullyQalifiedNameOfMarkerAttribute}]
     public static partial class DataPortalExtensions {{
@@ -23,7 +23,7 @@ namespace GeneratorTests {{
     public static Task Verify(string cslaSource, string additionalSource, Func<SettingsTask, SettingsTask> configureVerify) {
 
         var syntaxTrees = new List<SyntaxTree>() {
-            CSharpSyntaxTree.ParseText(_classToGenerateExtensionsInto), // ExtensionClassTree
+            CSharpSyntaxTree.ParseText(ClassToGenerateExtensionsInto), // ExtensionClassTree
             CSharpSyntaxTree.ParseText(cslaSource) // CslaContainingTypeTree
         };
 

@@ -173,6 +173,7 @@ public class DummyBOWithParams {{
     public Task ParameterWithGenericArity1() {
         var cslaSource = $@"
 using Csla;
+using System;
 using System.Collections.Generic;
 
 namespace VerifyTests;
@@ -185,6 +186,42 @@ public class DummyBOWithParams {{
 ";
 
         return TestHelper.Verify(cslaSource);
+    }
+
+    [Fact]
+    public Task ParameterWithGenericArity3() {
+        var cslaSource = $@"
+using Csla;
+using GenericTests;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    public void Bar(TestGenerica<RandomClass, RandomClass.RandomInner, RandomClass.RandomInner.ImportantEnum> krznbf) {{
+    }}
+}}
+";
+
+        var additionalTypes = $@"
+namespace GenericTests;
+
+public class TestGenerica<T1,T2,T3> {{
+    public T1 Type1 {{ get; set; }}
+    public T2 Type2 {{ get; set; }}
+    public T3 Type3 {{ get; set; }}
+}}
+
+public class RandomClass {{
+    public class RandomInner {{
+        public enum ImportantEnum {{
+            None = 0
+        }}
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, additionalTypes);
     }
 
     [Fact]
