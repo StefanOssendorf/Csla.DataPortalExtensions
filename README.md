@@ -49,7 +49,6 @@ static partial class DataPortalExtensions {
 ### Raodmap
 - Special case commands to an extension like `commandPortal.ExecuteCommand(<params>)` which combines `Create`+`Execute`.
 - Support for generic business objects
-- Support for parameters with generics arity > 1
 - Improve handling of csla method parameters which are `internal` and not available
 - Add configurability
   - Add attribute as prefix/suffix: 
