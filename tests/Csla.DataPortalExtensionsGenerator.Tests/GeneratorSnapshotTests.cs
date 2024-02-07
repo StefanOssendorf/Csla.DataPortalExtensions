@@ -27,7 +27,7 @@ namespace VerifyTests;
 public class DummyBO {{
     
     [{portalMethod}]
-    public void Foo() {{
+    private void Foo() {{
     }}
 }}
 ";
@@ -45,7 +45,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? id, string krznbf, Guid reference) {{
+    private void Bar(int? id, string krznbf, Guid reference) {{
     }}
 }}
 ";
@@ -62,7 +62,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
+    private void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
     }}
 }}
 ";
@@ -79,7 +79,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf, string abcdefg = """") {{
+    private void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf, string abcdefg = """") {{
     }}
 }}
 ";
@@ -96,7 +96,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar([Inject] IDataPortalFactory dpf, [Inject] IChildDataPortalFactory cdpf) {{
+    private void Bar([Inject] IDataPortalFactory dpf, [Inject] IChildDataPortalFactory cdpf) {{
     }}
 }}
 ";
@@ -114,7 +114,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? id, Foo.Bar krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
+    private void Bar(int? id, Foo.Bar krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
     }}
 }}
 ";
@@ -142,7 +142,7 @@ namespace VerifyTests;
 public class DummyBOWithParams {{
     public class InnerDummy {{
         [Fetch]
-        public void Bar() {{
+        private void Bar() {{
         }}
     }}
 }}
@@ -161,7 +161,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar({type}? krznbf) {{
+    private void Bar({type}? krznbf) {{
     }}
 }}
 ";
@@ -180,7 +180,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(IEnumerable<Guid> krznbf) {{
+    private void Bar(IEnumerable<Guid> krznbf) {{
     }}
 }}
 ";
@@ -198,7 +198,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(TestGenerica<RandomClass, RandomClass.RandomInner, RandomClass.RandomInner.ImportantEnum> krznbf) {{
+    private void Bar(TestGenerica<RandomClass, RandomClass.RandomInner, RandomClass.RandomInner.ImportantEnum> krznbf) {{
     }}
 }}
 ";
@@ -234,7 +234,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(SomeEnum? krznbf) {{
+    private void Bar(SomeEnum? krznbf) {{
     }}
 }}
 ";
@@ -261,7 +261,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(SomeEnum krznbf) {{
+    private void Bar(SomeEnum krznbf) {{
     }}
 }}
 ";
@@ -278,6 +278,32 @@ public enum SomeEnum {{
         return TestHelper.Verify(cslaSource, someEnumSource);
     }
 
+    [Fact]
+    public Task InternalParameterMustMakeTheExtensionInternal() {
+        var cslaSource = $@"
+using Csla;
+using TestInternal;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(string a, SomeInternalType b) {{
+    }}
+}}
+";
+
+        var someInternalType = $@"
+using System;
+
+namespace TestInternal;
+
+internal record SomeInternalType(string Name, Guid Id);
+";
+
+        return TestHelper.Verify(cslaSource, someInternalType);
+    }
+
     [Theory]
     [MemberData(nameof(CSharpBuiltInTypes))]
     public Task ArrayOfBuiltInTypes(string type) {
@@ -288,7 +314,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar({type}[] krznbf) {{
+    private void Bar({type}[] krznbf) {{
     }}
 }}
 ";

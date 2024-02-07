@@ -138,7 +138,8 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
                 continue;
             }
 
-            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), FormatForParameterUsage(parameter, parameterTypeSymbol)));
+            var hasPublicModifier = HasPublicVisibility(parameterTypeSymbol);
+            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), FormatForParameterUsage(parameter, parameterTypeSymbol), hasPublicModifier));
         }
 
         return new EquatableArray<OperationParameter>([.. foundParameters]);
@@ -157,6 +158,13 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
             }
 
             return false;
+        }
+
+        static bool HasPublicVisibility(ITypeSymbol typeSymbol) {
+            if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol) {
+                typeSymbol = arrayTypeSymbol.ElementType;
+            }
+            return typeSymbol.DeclaredAccessibility == Accessibility.Public;
         }
     }
 
