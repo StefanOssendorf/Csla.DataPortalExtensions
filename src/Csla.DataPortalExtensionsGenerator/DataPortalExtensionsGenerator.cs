@@ -81,26 +81,31 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
         if (methodDeclaration.Parent is not ClassDeclarationSyntax classDeclaration) {
             return null;
         }
+
         ct.ThrowIfCancellationRequested();
 
         if (ctx.SemanticModel.GetTypeInfo(attributeSyntax).Type is not { ContainingNamespace.Name: "Csla" } attributeTypeInfo) {
             return null;
         }
+
         ct.ThrowIfCancellationRequested();
 
         if (ctx.SemanticModel.GetDeclaredSymbol(methodDeclaration, ct) is not IMethodSymbol methodSymbol) {
             return null;
         }
+
         ct.ThrowIfCancellationRequested();
 
         if (ctx.SemanticModel.GetDeclaredSymbol(classDeclaration, ct) is not INamedTypeSymbol classSymbol || classSymbol.ContainingNamespace.IsGlobalNamespace) {
             return null;
         }
+
         ct.ThrowIfCancellationRequested();
 
         if (!GeneratorHelper.RecognizedCslaDataPortalAttributes.TryGetValue(attributeTypeInfo.Name, out var dataPortalMethod)) {
             return null;
         }
+
         ct.ThrowIfCancellationRequested();
 
         var objectHasPublicModifier = classDeclaration.Modifiers.Any(x => x.ToString().Equals("public", StringComparison.OrdinalIgnoreCase));
@@ -129,11 +134,12 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
                 continue;
             }
 
-            if (semanticModel.GetTypeInfo(parameter.Type).Type is not INamedTypeSymbol parameterTypeSymbol) {
+            if (semanticModel.GetTypeInfo(parameter.Type).Type is not ITypeSymbol parameterTypeSymbol) {
                 continue;
             }
 
-            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace.ToString(), parameter.Identifier.ToString(), FormatForParameterUsage(parameter, parameterTypeSymbol)));
+            var hasPublicModifier = HasPublicVisibility(parameterTypeSymbol);
+            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), FormatForParameterUsage(parameter, parameterTypeSymbol), hasPublicModifier));
         }
 
         return new EquatableArray<OperationParameter>([.. foundParameters]);
@@ -153,43 +159,110 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
 
             return false;
         }
+
+        static bool HasPublicVisibility(ITypeSymbol typeSymbol) {
+            if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol) {
+                typeSymbol = arrayTypeSymbol.ElementType;
+            }
+            return typeSymbol.DeclaredAccessibility == Accessibility.Public;
+        }
     }
 
-    private static string FormatForParameterUsage(ParameterSyntax parameter, INamedTypeSymbol parameterTypeSymbol) {
+    private static string FormatForParameterUsage(ParameterSyntax parameter, ITypeSymbol parameterTypeSymbol) {
         var typeString = parameterTypeSymbol.ToString();
         switch (typeString) {
             case "string":
+            case "string[]":
             case "bool":
+            case "bool[]":
             case "bool?":
             case "byte":
+            case "byte[]":
             case "byte?":
             case "sbyte":
+            case "sbyte[]":
             case "sbyte?":
             case "char":
+            case "char[]":
             case "char?":
             case "decimal":
+            case "decimal[]":
             case "decimal?":
             case "double":
+            case "double[]":
             case "double?":
             case "float":
+            case "float[]":
             case "float?":
             case "int":
+            case "int[]":
             case "int?":
             case "uint":
+            case "uint[]":
             case "uint?":
             case "long":
+            case "long[]":
             case "long?":
             case "ulong":
+            case "ulong[]":
             case "ulong?":
             case "short":
+            case "short[]":
             case "short?":
             case "ushort":
+            case "ushort[]":
             case "ushort?":
             case "object":
+            case "object[]":
                 return parameter.ToString();
         }
 
-        return $"global::{parameterTypeSymbol.ContainingNamespace}.{parameter}";
+        var typeStringBuilder = GetTypeString(parameterTypeSymbol);
+
+        return $"{typeStringBuilder} {parameter.Identifier}";
+
+        static StringBuilder GetTypeString(ITypeSymbol typeSymbol, StringBuilder? sb = null) {
+            sb ??= new();
+
+            sb.Append("global::");
+            if (!typeSymbol.ContainingNamespace.IsGlobalNamespace) {
+                sb.Append(typeSymbol.ContainingNamespace).Append(".");
+            }
+
+            sb.Append(GetTypeWithHierarchy(typeSymbol));
+
+            if (typeSymbol is INamedTypeSymbol { TypeArguments.Length: > 0 } namedTypeSymbol) {
+                sb.Append("<");
+
+                for (var i = 0; i < namedTypeSymbol.TypeArguments.Length; i++) {
+                    if (i > 0) {
+                        sb.Append(", ");
+                    }
+
+                    sb = GetTypeString(namedTypeSymbol.TypeArguments[i], sb);
+                }
+
+                sb.Append(">");
+            }
+
+            return sb;
+
+            static StringBuilder GetTypeWithHierarchy(ITypeSymbol? typeSymbol, StringBuilder? sb = null) {
+                if (typeSymbol is null) {
+                    return sb ?? new();
+                }
+
+                sb ??= new();
+
+                if (sb.Length > 0) {
+                    sb.Insert(0, ".");
+                }
+
+                sb.Insert(0, typeSymbol.Name);
+
+                return GetTypeWithHierarchy(typeSymbol.ContainingType, sb);
+            }
+        }
     }
 
     #endregion

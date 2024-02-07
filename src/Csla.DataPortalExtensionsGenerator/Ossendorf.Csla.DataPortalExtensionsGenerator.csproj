@@ -5,14 +5,9 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IsPackable>true</IsPackable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Compile Remove="bin\**" />
-      <EmbeddedResource Remove="bin\**" />
-      <None Remove="bin\**" />
-    </ItemGroup>
-
+    
     <!-- The following libraries include the source generator interfaces and types we need -->
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />

@@ -27,7 +27,7 @@ namespace VerifyTests;
 public class DummyBO {{
     
     [{portalMethod}]
-    public void Foo() {{
+    private void Foo() {{
     }}
 }}
 ";
@@ -45,7 +45,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? id, string krznbf, Guid reference) {{
+    private void Bar(int? id, string krznbf, Guid reference) {{
     }}
 }}
 ";
@@ -62,7 +62,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
+    private void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
     }}
 }}
 ";
@@ -79,7 +79,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf, string abcdefg = """") {{
+    private void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf, string abcdefg = """") {{
     }}
 }}
 ";
@@ -96,7 +96,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar([Inject] IDataPortalFactory dpf, [Inject] IChildDataPortalFactory cdpf) {{
+    private void Bar([Inject] IDataPortalFactory dpf, [Inject] IChildDataPortalFactory cdpf) {{
     }}
 }}
 ";
@@ -114,7 +114,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? id, Foo.Bar krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
+    private void Bar(int? id, Foo.Bar krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
     }}
 }}
 ";
@@ -142,7 +142,7 @@ namespace VerifyTests;
 public class DummyBOWithParams {{
     public class InnerDummy {{
         [Fetch]
-        public void Bar() {{
+        private void Bar() {{
         }}
     }}
 }}
@@ -151,8 +151,9 @@ public class DummyBOWithParams {{
         return TestHelper.Verify(cslaSource);
     }
 
-    [Fact]
-    public Task NullablePrimitveParameter() {
+    [Theory]
+    [MemberData(nameof(CSharpBuiltInTypesNullable))]
+    public Task NullablePrimitveParameter(string type) {
         var cslaSource = $@"
 using Csla;
 
@@ -160,11 +161,170 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    public void Bar(int? krznbf) {{
+    private void Bar({type}? krznbf) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
+    }
+
+    [Fact]
+    public Task ParameterWithGenericArity1() {
+        var cslaSource = $@"
+using Csla;
+using System;
+using System.Collections.Generic;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(IEnumerable<Guid> krznbf) {{
     }}
 }}
 ";
 
         return TestHelper.Verify(cslaSource);
     }
+
+    [Fact]
+    public Task ParameterWithGenericArity3() {
+        var cslaSource = $@"
+using Csla;
+using GenericTests;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(TestGenerica<RandomClass, RandomClass.RandomInner, RandomClass.RandomInner.ImportantEnum> krznbf) {{
+    }}
+}}
+";
+
+        var additionalTypes = $@"
+namespace GenericTests;
+
+public class TestGenerica<T1,T2,T3> {{
+    public T1 Type1 {{ get; set; }}
+    public T2 Type2 {{ get; set; }}
+    public T3 Type3 {{ get; set; }}
+}}
+
+public class RandomClass {{
+    public class RandomInner {{
+        public enum ImportantEnum {{
+            None = 0
+        }}
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, additionalTypes);
+    }
+
+    [Fact]
+    public Task NullableEnumParameter() {
+        var cslaSource = $@"
+using Csla;
+using TestEnum;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(SomeEnum? krznbf) {{
+    }}
+}}
+";
+
+        var someEnumSource = $@"
+namespace TestEnum;
+
+public enum SomeEnum {{
+    None = 0,
+    Some = 1
+}}
+";
+
+        return TestHelper.Verify(cslaSource, someEnumSource);
+    }
+
+    [Fact]
+    public Task EnumParameter() {
+        var cslaSource = $@"
+using Csla;
+using TestEnum;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(SomeEnum krznbf) {{
+    }}
+}}
+";
+
+        var someEnumSource = $@"
+namespace TestEnum;
+
+public enum SomeEnum {{
+    None = 0,
+    Some = 1
+}}
+";
+
+        return TestHelper.Verify(cslaSource, someEnumSource);
+    }
+
+    [Fact]
+    public Task InternalParameterMustMakeTheExtensionInternal() {
+        var cslaSource = $@"
+using Csla;
+using TestInternal;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(string a, SomeInternalType b) {{
+    }}
+}}
+";
+
+        var someInternalType = $@"
+using System;
+
+namespace TestInternal;
+
+internal record SomeInternalType(string Name, Guid Id);
+";
+
+        return TestHelper.Verify(cslaSource, someInternalType);
+    }
+
+    [Theory]
+    [MemberData(nameof(CSharpBuiltInTypes))]
+    public Task ArrayOfBuiltInTypes(string type) {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar({type}[] krznbf) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
+    }
+
+    public static TheoryData<string> CSharpBuiltInTypes => new(_csharpBuiltInTypes);
+
+    public static TheoryData<string> CSharpBuiltInTypesNullable => new(_csharpBuiltInTypes.Where(t => t is not "string" and not "object"));
+
+    private static readonly string[] _csharpBuiltInTypes = ["string", "bool", "byte", "sbyte", "char", "decimal", "double", "float", "int", "uint", "long", "ulong", "short", "ushort", "object"];
 }

@@ -45,7 +45,6 @@ namespace Ossendorf.Csla.DataPortalExtensionsGenerator {{
             }
 
             var boName = operationsByClass.Key.GloballyQualifiedName;
-            var visibilityModifier = operationsByClass.Key.HasPublicModifier ? "public" : "internal";
 
             foreach (var operation in operationsByClass) {
                 ct.ThrowIfCancellationRequested();
@@ -60,6 +59,8 @@ namespace Ossendorf.Csla.DataPortalExtensionsGenerator {{
 
                 var (parameters, arguments) = GetParametersAndArgumentsToUse(operation.Parameters, ct);
 
+                var visibilityModifier = operationsByClass.Key.HasPublicModifier && operation.Parameters.All(p => p.IsPublic) ? "public" : "internal";
+
                 _ = sb.Append(intendation)
                     .Append(visibilityModifier).Append(" static ")
                     .Append("global::System.Threading.Tasks.").Append(returnType).Append(" ").Append(operation.MethodName)
@@ -69,6 +70,7 @@ namespace Ossendorf.Csla.DataPortalExtensionsGenerator {{
                     .Append("(").Append(arguments).Append(");").AppendLine();
             }
         }
+
         return sb;
 
         static bool IsChildMethod(DataPortalMethod portalMethod) {
