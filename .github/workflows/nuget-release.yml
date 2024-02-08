@@ -27,4 +27,4 @@ jobs:
     - name: Pack
       run: dotnet pack --no-build --verbosity normal --nologo -o "artifacts/" -c Release
     - name: Publish Nuget
-      run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{secrets.NUGETPUSHAPIKEY}}
+      run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{secrets.NUGETPUSHAPIKEY}} -s https://api.nuget.org/v3/index.json
