@@ -56,3 +56,7 @@ static partial class DataPortalExtensions {
     - `ById(id)` -> `ByIdFetch(id)`
   - Exclude non-public business objects from generation
   - Exclude methods with non-public parameter types
+- Add attribute to exclude methods explicitly
+
+
+A lot of implementation details are derived/taken from the great series [Andrew Lock: Creating a source generator](https://andrewlock.net/series/creating-a-source-generator/). If you want to create your own source generator I can recommend that series wholeheartedly.
