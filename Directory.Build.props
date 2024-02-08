@@ -5,12 +5,20 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <PropertyGroup>
         <Company></Company>
         <Authors>Stefan Ossendorf</Authors>
         <Copyright>© $([System.DateTime]::Now.ToString(yyyy)) $(Authors)</Copyright>
-        <Version>0.0.1-pre02</Version>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
     </PropertyGroup>
 </Project>
