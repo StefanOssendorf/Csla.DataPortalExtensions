@@ -164,6 +164,7 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
             if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol) {
                 typeSymbol = arrayTypeSymbol.ElementType;
             }
+
             return typeSymbol.DeclaredAccessibility == Accessibility.Public;
         }
     }
