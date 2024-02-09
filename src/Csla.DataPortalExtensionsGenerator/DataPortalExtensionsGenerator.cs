@@ -220,7 +220,12 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
 
         var typeStringBuilder = GetTypeString(parameterTypeSymbol);
 
-        return $"{typeStringBuilder} {parameter.Identifier}";
+        var parameterVariableName = parameter.Identifier.ToString();
+        if (parameter.Default is not null) {
+            parameterVariableName += $" {parameter.Default}";
+        }
+
+        return $"{typeStringBuilder} {parameterVariableName}";
 
         static StringBuilder GetTypeString(ITypeSymbol typeSymbol, StringBuilder? sb = null) {
             sb ??= new();
