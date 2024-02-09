@@ -1,3 +1,7 @@
+using System;
+using System.Threading.Tasks;
+using Xunit;
+
 namespace Ossendorf.Csla.DataPortalExtensionsGenerator.Tests;
 
 [UsesVerify]
@@ -302,6 +306,41 @@ internal record SomeInternalType(string Name, Guid Id);
 ";
 
         return TestHelper.Verify(cslaSource, someInternalType);
+    }
+
+    [Fact]
+    public Task GenericParameterWithDefaultValue() {
+        var cslaSource = $@"
+using Csla;
+using System.Collections.Generic;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(string a, int b = 1, List<string> list = null, string x = null) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource);
+    }
+
+    [Fact]
+    public Task BuiltInTypeArrayWithDefaultValue() {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(string a, int b = 1, int[] c = null, string x = null) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, t => t.AutoVerify());
     }
 
     [Theory]
