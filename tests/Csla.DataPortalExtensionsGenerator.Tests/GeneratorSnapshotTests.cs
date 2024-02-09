@@ -343,6 +343,33 @@ public class DummyBOWithParams {{
         return TestHelper.Verify(cslaSource, t => t.AutoVerify());
     }
 
+    [Fact]
+    public Task EnumParameterDefaultValue() {
+        var cslaSource = $@"
+using Csla;
+using TestEnum;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(SomeEnum krznbf = SomeEnum.Some) {{
+    }}
+}}
+";
+
+        var someEnumSource = $@"
+namespace TestEnum;
+
+public enum SomeEnum {{
+    None = 0,
+    Some = 1
+}}
+";
+
+        return TestHelper.Verify(cslaSource, someEnumSource);
+    }
+
     [Theory]
     [MemberData(nameof(CSharpBuiltInTypes))]
     public Task ArrayOfBuiltInTypes(string type) {
