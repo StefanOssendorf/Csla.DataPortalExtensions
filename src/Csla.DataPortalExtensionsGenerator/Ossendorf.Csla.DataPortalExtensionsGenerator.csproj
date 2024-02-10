@@ -15,7 +15,7 @@
     
     <PropertyGroup>
         <PackageId>Ossendorf.Csla.DataPortalExtensionGenerator</PackageId>
-        <PackageTags>CSLA.NET IDataPortal IChildDataPortal DataPortalExtensions</PackageTags>
+        <PackageTags>CSLA.NET IDataPortal IChildDataPortal DataPortalExtensions CSLA</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/StefanOssendorf/Csla.DataPortalExtensions</PackageProjectUrl>
         <PackageReleaseNotes>https://github.com/StefanOssendorf/Csla.DataPortalExtensions/releases</PackageReleaseNotes>
