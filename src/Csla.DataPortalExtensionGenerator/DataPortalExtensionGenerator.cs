@@ -2,16 +2,15 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Text;
 
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 /// <summary>
 /// The data portal extension source generator.
 /// </summary>
 [Generator]
-public class DataPortalExtensionsGenerator : IIncrementalGenerator {
+public class DataPortalExtensionGenerator : IIncrementalGenerator {
 
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context) {
@@ -240,7 +239,7 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
 
         var parameterVariableName = parameter.Identifier.ToString();
         if (parameter.Default is not null) {
-            if(parameterTypeSymbol is { TypeKind: TypeKind.Enum } && parameter.Default.Value is MemberAccessExpressionSyntax valueOfEnum) {
+            if (parameterTypeSymbol is { TypeKind: TypeKind.Enum } && parameter.Default.Value is MemberAccessExpressionSyntax valueOfEnum) {
                 parameterVariableName += $" = {typeStringBuilder}.{valueOfEnum.Name}";
             } else {
                 parameterVariableName += $" {parameter.Default}";
@@ -303,10 +302,10 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
         if (classes.IsDefaultOrEmpty || methods.IsDefaultOrEmpty) {
             return;
         }
-        
+
         foreach (var extensionClass in classes) {
             context.CancellationToken.ThrowIfCancellationRequested();
-            
+
             var code = GenerateCode(in extensionClass, in methods, in data.Options, context.CancellationToken);
             var typeNamespace = extensionClass.Namespace;
             if (!string.IsNullOrWhiteSpace(typeNamespace)) {

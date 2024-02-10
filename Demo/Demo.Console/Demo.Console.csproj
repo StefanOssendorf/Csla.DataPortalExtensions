@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Csla.DataPortalExtensionsGenerator\Ossendorf.Csla.DataPortalExtensionsGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+        <ProjectReference Include="..\..\src\Csla.DataPortalExtensionGenerator\Ossendorf.Csla.DataPortalExtensionGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>
 
 </Project>

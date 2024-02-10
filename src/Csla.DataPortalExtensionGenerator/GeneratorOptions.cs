@@ -1,5 +1,4 @@
-﻿
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator;
+﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 internal readonly record struct GeneratorOptions {
     public readonly string MethodPrefix;

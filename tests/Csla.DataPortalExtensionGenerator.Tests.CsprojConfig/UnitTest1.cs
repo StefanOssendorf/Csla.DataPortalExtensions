@@ -22,7 +22,7 @@ public class TestBO : BusinessBase<TestBO> {
 }
 
 
-[Ossendorf.Csla.DataPortalExtensionsGenerator.DataPortalExtensions]
+[Ossendorf.Csla.DataPortalExtensionGenerator.DataPortalExtensions]
 public static partial class TestExtensions {
 
 }

@@ -5,9 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo.Console", "Demo\Demo.Console\Demo.Console.csproj", "{D436D311-EAC7-4A17-9267-59F7EB42F369}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionsGenerator", "src\Csla.DataPortalExtensionsGenerator\Ossendorf.Csla.DataPortalExtensionsGenerator.csproj", "{87C964DF-947D-4712-96C9-0F60A73DA4DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator", "src\Csla.DataPortalExtensionGenerator\Ossendorf.Csla.DataPortalExtensionGenerator.csproj", "{87C964DF-947D-4712-96C9-0F60A73DA4DC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionsGenerator.Tests", "tests\Csla.DataPortalExtensionsGenerator.Tests\Ossendorf.Csla.DataPortalExtensionsGenerator.Tests.csproj", "{25E6673B-D744-4C78-8D71-4AB3C82DC3BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator.Tests", "tests\Csla.DataPortalExtensionGenerator.Tests\Ossendorf.Csla.DataPortalExtensionGenerator.Tests.csproj", "{25E6673B-D744-4C78-8D71-4AB3C82DC3BD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CB7BB8AE-25F0-484D-AFDE-E5F913BC656D}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ossendorf.Csla.DataPortalExtensionsGenerator.Tests.CsprojConfig", "tests\Ossendorf.Csla.DataPortalExtensionsGenerator.Tests.CsprojConfig\Ossendorf.Csla.DataPortalExtensionsGenerator.Tests.CsprojConfig.csproj", "{A77F3CB6-9E1B-45D0-A50F-E1D377A14525}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator.Tests.CsprojConfig", "tests\Csla.DataPortalExtensionGenerator.Tests.CsprojConfig\Ossendorf.Csla.DataPortalExtensionGenerator.Tests.CsprojConfig.csproj", "{1E7D7B79-5C39-4643-B8F4-2D43F4E8F0C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +37,10 @@ Global
 		{25E6673B-D744-4C78-8D71-4AB3C82DC3BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25E6673B-D744-4C78-8D71-4AB3C82DC3BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25E6673B-D744-4C78-8D71-4AB3C82DC3BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A77F3CB6-9E1B-45D0-A50F-E1D377A14525}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A77F3CB6-9E1B-45D0-A50F-E1D377A14525}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A77F3CB6-9E1B-45D0-A50F-E1D377A14525}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A77F3CB6-9E1B-45D0-A50F-E1D377A14525}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E7D7B79-5C39-4643-B8F4-2D43F4E8F0C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E7D7B79-5C39-4643-B8F4-2D43F4E8F0C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E7D7B79-5C39-4643-B8F4-2D43F4E8F0C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E7D7B79-5C39-4643-B8F4-2D43F4E8F0C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

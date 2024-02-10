@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 /// <summary>
 /// Polyfill for .NET 6 HashCode  
