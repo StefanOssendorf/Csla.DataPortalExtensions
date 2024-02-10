@@ -7,7 +7,9 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,13 +27,12 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <DataPortalExtensionGen_MethodPrefix>My</DataPortalExtensionGen_MethodPrefix>
+        <DataPortalExtensionGen_MethodPrefix>Prefix</DataPortalExtensionGen_MethodPrefix>
+        <DataPortalExtensionGen_MethodSuffix>Suffix</DataPortalExtensionGen_MethodSuffix>
     </PropertyGroup>
 
-    <ItemGroup>
-        <CompilerVisibleProperty Include="DataPortalExtensionGen_MethodPrefix" />
-    </ItemGroup>
-
+    <Import Project="../../src/Csla.DataPortalExtensionGenerator/build/Ossendorf.Csla.DataPortalExtensionGenerator.props"/>
+    
     <ItemGroup>
         <ProjectReference Include="..\..\src\Csla.DataPortalExtensionGenerator\Ossendorf.Csla.DataPortalExtensionGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>
