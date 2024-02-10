@@ -37,7 +37,6 @@
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="\" />
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-        <None Include="build/*" Pack="true" PackgePath="" />
-        <None Include="buildTransitive/*" Pack="true" PackgePath="" />
+        <None Include="Ossendorf.Csla.DataPortalExtensionGenerator.props" Pack="true" PackagePath="build" />
     </ItemGroup>
 </Project>

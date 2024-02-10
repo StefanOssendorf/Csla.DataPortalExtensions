@@ -31,7 +31,7 @@
         <DataPortalExtensionGen_MethodSuffix>Suffix</DataPortalExtensionGen_MethodSuffix>
     </PropertyGroup>
 
-    <Import Project="../../src/Csla.DataPortalExtensionGenerator/build/Ossendorf.Csla.DataPortalExtensionGenerator.props"/>
+    <Import Project="../../src/Csla.DataPortalExtensionGenerator/Ossendorf.Csla.DataPortalExtensionGenerator.props"/>
     
     <ItemGroup>
         <ProjectReference Include="..\..\src\Csla.DataPortalExtensionGenerator\Ossendorf.Csla.DataPortalExtensionGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
