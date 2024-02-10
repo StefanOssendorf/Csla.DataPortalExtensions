@@ -318,7 +318,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    private void Bar(string a, int b = 1, List<string> list = null, string x = null) {{
+    private void Bar(string a, int b = 1, List<string> list = null, string x = null, string z = """") {{
     }}
 }}
 ";
@@ -340,7 +340,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, t => t.AutoVerify());
+        return TestHelper.Verify(cslaSource);
     }
 
     [Fact]
