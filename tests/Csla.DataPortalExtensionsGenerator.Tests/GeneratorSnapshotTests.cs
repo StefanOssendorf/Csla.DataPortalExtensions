@@ -4,7 +4,6 @@ using Xunit;
 
 namespace Ossendorf.Csla.DataPortalExtensionsGenerator.Tests;
 
-[UsesVerify]
 public class GeneratorSnapshotTests {
 
     public static TheoryData<string> AllSupportedDataPortalMethods {

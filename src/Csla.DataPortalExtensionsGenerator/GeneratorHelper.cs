@@ -36,7 +36,7 @@ namespace Ossendorf.Csla.DataPortalExtensionsGenerator {{
     //public static StringBuilder AppendNullableContextDependingOnTarget(this StringBuilder sb, Microsoft.CodeAnalysis.NullableAnnotation nullableAnnotation)
     //    => sb.AppendLine("#nullable enable");
 
-    public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate?> foundOperations, CancellationToken ct) {
+    public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate?> foundOperations, in GeneratorOptions options, CancellationToken ct) {
         const string intendation = "        ";
 
         var groupedByClass = foundOperations.Cast<PortalOperationToGenerate>().GroupBy(o => o.Object).ToImmutableArray();
@@ -67,7 +67,7 @@ namespace Ossendorf.Csla.DataPortalExtensionsGenerator {{
 
                 _ = sb.Append(intendation)
                     .Append(visibilityModifier).Append(" static ")
-                    .Append("global::System.Threading.Tasks.").Append(returnType).Append(" ").Append(operation.MethodName)
+                    .Append("global::System.Threading.Tasks.").Append(returnType).Append(" ").Append(options.MethodPrefix).Append(operation.MethodName).Append(options.MethodSuffix)
                     .Append("(this global::Csla.I").Append(childPrefix).Append("DataPortal<").Append(boName).Append("> ")
                     .Append("portal").Append(parameters).Append(")")
                     .Append(" => portal.").Append(operation.PortalMethod.ToStringFast()).Append("Async")

@@ -48,7 +48,7 @@ namespace GeneratorTests {{
         var generator = new DataPortalExtensionsGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-
+        
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var _);
 
         outputCompilation.GetDiagnostics().Should().BeEmpty();
