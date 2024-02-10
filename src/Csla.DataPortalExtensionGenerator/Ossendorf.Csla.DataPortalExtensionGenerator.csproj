@@ -14,7 +14,7 @@
     </PropertyGroup>
     
     <PropertyGroup>
-        <PackageId>Ossendorf.Csla.DataPortalExtensionsGeneratorDataPortalExtensionsGeneratorOssendorf.Csla.DataPortalExtensionGeneratorOssendorf.Csla.DataPortalExtensionGenerator</PackageId>
+        <PackageId>Ossendorf.Csla.DataPortalExtensionGenerator</PackageId>
         <PackageTags>CSLA.NET IDataPortal IChildDataPortal DataPortalExtensions CSLA</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/StefanOssendorf/Csla.DataPortalExtensions</PackageProjectUrl>
