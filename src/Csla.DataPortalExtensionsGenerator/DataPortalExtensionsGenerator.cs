@@ -222,7 +222,13 @@ public class DataPortalExtensionsGenerator : IIncrementalGenerator {
 
         var parameterVariableName = parameter.Identifier.ToString();
         if (parameter.Default is not null) {
-            parameterVariableName += $" {parameter.Default}";
+            if(parameterTypeSymbol is { TypeKind: TypeKind.Enum } && parameter.Default.Value is MemberAccessExpressionSyntax valueOfEnum) {
+                parameterVariableName += $" = {typeStringBuilder}.{valueOfEnum.Name}";
+            } else {
+                parameterVariableName += $" {parameter.Default}";
+            }
+            //const int NullLiteralExpression = 8754; // See https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp.syntaxkind?view=roslyn-dotnet-4.7.0#microsoft-codeanalysis-csharp-syntaxkind-nullliteralexpression
+            //if (parameter.Default is EqualsValueClauseSyntax { Value.RawKind: NullLiteralExpression }) {
         }
 
         return $"{typeStringBuilder} {parameterVariableName}";

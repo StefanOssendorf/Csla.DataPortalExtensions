@@ -22,7 +22,7 @@ public class GeneratorSnapshotTests {
 
     [Theory]
     [MemberData(nameof(AllSupportedDataPortalMethods))]
-    public Task WithEmptyParameterGeneratesCorrectly(string portalMethod) {
+    public Task EmptyParameters(string portalMethod) {
         var cslaSource = @$"
 using Csla;
 
@@ -40,7 +40,7 @@ public class DummyBO {{
     }
 
     [Fact]
-    public Task With3PrimitiveParametersShouldGenerateCorrectly() {
+    public Task MultiplePrimitiveParameters() {
         var cslaSource = $@"
 using Csla;
 using System;
@@ -58,7 +58,7 @@ public class DummyBOWithParams {{
     }
 
     [Fact]
-    public Task InjectedParametersMustBeIgnored() {
+    public Task InjectedParametersIgnored() {
         var cslaSource = $@"
 using Csla;
 
@@ -75,7 +75,7 @@ public class DummyBOWithParams {{
     }
 
     [Fact]
-    public Task ParametersWithDefaultValuesShouldBeUsedAsIs() {
+    public Task DefaultValueParameter() {
         var cslaSource = $@"
 using Csla;
 
@@ -92,7 +92,7 @@ public class DummyBOWithParams {{
     }
 
     [Fact]
-    public Task OperationWithOnlyInjectedParameters() {
+    public Task OnlyInjectedParameters() {
         var cslaSource = $@"
 using Csla;
 
@@ -157,7 +157,7 @@ public class DummyBOWithParams {{
 
     [Theory]
     [MemberData(nameof(CSharpBuiltInTypesNullable))]
-    public Task NullablePrimitveParameter(string type) {
+    public Task NullablePrimitves(string type) {
         var cslaSource = $@"
 using Csla;
 
@@ -174,7 +174,7 @@ public class DummyBOWithParams {{
     }
 
     [Fact]
-    public Task ParameterWithGenericArity1() {
+    public Task GenericArity1Parameter() {
         var cslaSource = $@"
 using Csla;
 using System;
@@ -193,7 +193,7 @@ public class DummyBOWithParams {{
     }
 
     [Fact]
-    public Task ParameterWithGenericArity3() {
+    public Task GenericArity3Parameter() {
         var cslaSource = $@"
 using Csla;
 using GenericTests;
@@ -229,7 +229,7 @@ public class RandomClass {{
     }
 
     [Fact]
-    public Task NullableEnumParameter() {
+    public Task NullableEnum() {
         var cslaSource = $@"
 using Csla;
 using TestEnum;
@@ -309,7 +309,7 @@ internal record SomeInternalType(string Name, Guid Id);
     }
 
     [Fact]
-    public Task GenericParameterWithDefaultValue() {
+    public Task GenericParameterDefaultValue() {
         var cslaSource = $@"
 using Csla;
 using System.Collections.Generic;
@@ -318,7 +318,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    private void Bar(string a, int b = 1, List<string> list = null, string x = null) {{
+    private void Bar(string a, int b = 1, List<string> list = null, string x = null, string z = """") {{
     }}
 }}
 ";
@@ -327,7 +327,7 @@ public class DummyBOWithParams {{
     }
 
     [Fact]
-    public Task BuiltInTypeArrayWithDefaultValue() {
+    public Task BuiltInTypeArrayDefaultValue() {
         var cslaSource = $@"
 using Csla;
 
@@ -340,12 +340,39 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, t => t.AutoVerify());
+        return TestHelper.Verify(cslaSource);
+    }
+
+    [Fact]
+    public Task EnumParameterDefaultValue() {
+        var cslaSource = $@"
+using Csla;
+using TestEnum;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(SomeEnum krznbf = SomeEnum.Some) {{
+    }}
+}}
+";
+
+        var someEnumSource = $@"
+namespace TestEnum;
+
+public enum SomeEnum {{
+    None = 0,
+    Some = 1
+}}
+";
+
+        return TestHelper.Verify(cslaSource, someEnumSource);
     }
 
     [Theory]
     [MemberData(nameof(CSharpBuiltInTypes))]
-    public Task ArrayOfBuiltInTypes(string type) {
+    public Task BuiltInTypeArray(string type) {
         var cslaSource = $@"
 using Csla;
 
