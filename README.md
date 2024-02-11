@@ -47,7 +47,7 @@ This will generate the following code:
 static partial class DataPortalExtensions {
     public static global::System.Threading.Tasks.Task<global::MyNamespace.Address> CreateLocally(this global::Csla.IDataPortal<global::MyNamespace.Address> portal) => portal.CreateAsync();
     public static global::System.Threading.Tasks.Task<global::MyNamespace.Address> ById(this global::Csla.IDataPortal<global::MyNamespace.Address> portal, global::System.Guid id) => portal.FetchAsync(id);
-    public static global::System.Threading.Tasks.Task<global::MyNamespace.Address> ById(this global::Csla.IDataPortal<global::MyNamespace.Address> portal, string foo) => portal.FetchAsync(foo);
+    public static global::System.Threading.Tasks.Task<global::MyNamespace.Address> Fetch(this global::Csla.IDataPortal<global::MyNamespace.Address> portal, string foo) => portal.FetchAsync(foo);
 }
 ```
 
