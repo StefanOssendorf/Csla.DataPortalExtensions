@@ -15,7 +15,7 @@
     
     <PropertyGroup>
         <PackageId>Ossendorf.Csla.DataPortalExtensionGenerator</PackageId>
-        <PackageTags>CSLA.NET IDataPortal IChildDataPortal DataPortalExtensions</PackageTags>
+        <PackageTags>CSLA.NET IDataPortal IChildDataPortal DataPortalExtensions CSLA</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/StefanOssendorf/Csla.DataPortalExtensions</PackageProjectUrl>
         <PackageReleaseNotes>https://github.com/StefanOssendorf/Csla.DataPortalExtensions/releases</PackageReleaseNotes>
@@ -37,5 +37,6 @@
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="\" />
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="Ossendorf.Csla.DataPortalExtensionGenerator.props" Pack="true" PackagePath="build" />
     </ItemGroup>
 </Project>

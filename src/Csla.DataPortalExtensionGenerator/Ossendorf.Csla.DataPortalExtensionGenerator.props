@@ -1,0 +1,6 @@
+<Project>
+    <ItemGroup>
+        <CompilerVisibleProperty Include="DataPortalExtensionGen_MethodPrefix" />
+        <CompilerVisibleProperty Include="DataPortalExtensionGen_MethodSuffix" />
+    </ItemGroup>
+</Project>

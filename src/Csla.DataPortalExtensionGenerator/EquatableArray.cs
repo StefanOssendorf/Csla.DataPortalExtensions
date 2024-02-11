@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Immutable;
 
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 /// <summary>
 /// An immutable, equatable array. This is equivalent to Array{T} but with value equality support.

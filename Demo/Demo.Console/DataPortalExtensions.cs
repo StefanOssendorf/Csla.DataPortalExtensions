@@ -1,5 +1,5 @@
 ﻿namespace Demo.Console;
 
-[Ossendorf.Csla.DataPortalExtensionsGenerator.DataPortalExtensions]
+[Ossendorf.Csla.DataPortalExtensionGenerator.DataPortalExtensions]
 internal static partial class DataPortalExtensions {
 }

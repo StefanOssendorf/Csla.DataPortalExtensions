@@ -2,8 +2,9 @@
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Ossendorf.Csla.DataPortalExtensionGenerator;
 
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator.Tests;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
 
 internal class TestHelper {
 
@@ -45,10 +46,10 @@ namespace GeneratorTests {{
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
-        var generator = new DataPortalExtensionsGenerator();
+        var generator = new DataPortalExtensionGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-
+        
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var _);
 
         outputCompilation.GetDiagnostics().Should().BeEmpty();

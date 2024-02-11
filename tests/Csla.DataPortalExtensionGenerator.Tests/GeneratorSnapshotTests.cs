@@ -2,9 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator.Tests;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
 
-[UsesVerify]
 public class GeneratorSnapshotTests {
 
     public static TheoryData<string> AllSupportedDataPortalMethods {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator.Tests;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
 
 public static class ModuleInitializer {
 

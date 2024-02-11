@@ -1,6 +1,6 @@
 ﻿using NetEscapades.EnumGenerators;
 
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 [EnumExtensions]
 internal enum DataPortalMethod {

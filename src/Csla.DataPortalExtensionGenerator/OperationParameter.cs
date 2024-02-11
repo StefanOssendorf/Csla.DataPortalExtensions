@@ -1,4 +1,4 @@
-﻿namespace Ossendorf.Csla.DataPortalExtensionsGenerator;
+﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 internal readonly record struct OperationParameter {
     public readonly string Namespace;
