@@ -1,4 +1,11 @@
 # DataPortal extensions for [CSLA.NET](https://cslanet.com/)
+
+
+_![NuGet Version](https://img.shields.io/nuget/v/Ossendorf.Csla.DataPortalExtensionGenerator)_
+_![GitHub Release](https://img.shields.io/github/v/release/StefanOssendorf/Csla.DataPortalExtensions?include_prereleases)_  
+_[![PullRequest Validation](https://github.com/StefanOssendorf/Csla.DataPortalExtensions/actions/workflows/pr-ci.yml/badge.svg?branch=master)](https://github.com/StefanOssendorf/Csla.DataPortalExtensions/actions/workflows/pr-ci.yml)_
+
+
  A Source Generator package that generates extension methods for `IDataPortal<T>` and `IChildDataPortal<T>`.  
  The extension methods are derived from annotated methods of business objects using CSLA.NET attributes like `Fetch`, `Create`, `...`.
 
