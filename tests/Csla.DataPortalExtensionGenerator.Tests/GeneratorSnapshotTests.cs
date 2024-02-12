@@ -5,6 +5,11 @@ using Xunit;
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
 
 public class GeneratorSnapshotTests {
+    public static TheoryData<string> CSharpBuiltInTypes => new(_csharpBuiltInTypes);
+
+    public static TheoryData<string> CSharpBuiltInTypesNullable => new(_csharpBuiltInTypes.Where(t => t is not "string" and not "object"));
+
+    private static readonly string[] _csharpBuiltInTypes = ["string", "bool", "byte", "sbyte", "char", "decimal", "double", "float", "int", "uint", "long", "ulong", "short", "ushort", "object"];
 
     public static TheoryData<string> AllSupportedDataPortalMethods {
         get {
@@ -36,6 +41,24 @@ public class DummyBO {{
 ";
 
         return TestHelper.Verify(cslaSource, cfg => cfg.UseParameters(portalMethod));
+    }
+
+    [Theory]
+    [MemberData(nameof(CSharpBuiltInTypes))]
+    public Task BuiltInTypeArray(string type) {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar({type}[] krznbf) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
     }
 
     [Fact]
@@ -368,28 +391,4 @@ public enum SomeEnum {{
 
         return TestHelper.Verify(cslaSource, someEnumSource);
     }
-
-    [Theory]
-    [MemberData(nameof(CSharpBuiltInTypes))]
-    public Task BuiltInTypeArray(string type) {
-        var cslaSource = $@"
-using Csla;
-
-namespace VerifyTests;
-
-public class DummyBOWithParams {{
-    [Fetch]
-    private void Bar({type}[] krznbf) {{
-    }}
-}}
-";
-
-        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
-    }
-
-    public static TheoryData<string> CSharpBuiltInTypes => new(_csharpBuiltInTypes);
-
-    public static TheoryData<string> CSharpBuiltInTypesNullable => new(_csharpBuiltInTypes.Where(t => t is not "string" and not "object"));
-
-    private static readonly string[] _csharpBuiltInTypes = ["string", "bool", "byte", "sbyte", "char", "decimal", "double", "float", "int", "uint", "long", "ulong", "short", "ushort", "object"];
 }
