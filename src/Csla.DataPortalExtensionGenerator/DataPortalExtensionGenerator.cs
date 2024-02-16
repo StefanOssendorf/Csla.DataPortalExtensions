@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
 using System.Collections.Immutable;
 using System.Text;
 
@@ -22,13 +24,12 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
         => context.RegisterPostInitializationOutput(ctx => ctx.AddSource("DataPortalExtensionsAttribute.g.cs", SourceText.From(GeneratorHelper.MarkerAttribute, Encoding.UTF8)));
 
     private void AddCodeGenerator(IncrementalGeneratorInitializationContext context) {
-        var extensionClassDeclaration = context.SyntaxProvider
+        var extensionClassesAndDiagnostics = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: GeneratorHelper.FullyQalifiedNameOfMarkerAttribute,
                 predicate: static (node, _) => node is ClassDeclarationSyntax,
                 transform: GetClassToGenerateInto
-            )
-            .Collect();
+            );
 
         var methodDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -40,8 +41,17 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
 
         var options = GetGeneratorOptions(context);
 
+        var extensionClassDeclaration = extensionClassesAndDiagnostics
+            .Where(static r => r.Errors.Count == 0)
+            .Select((r, _) => r.Value)
+            .Collect();
+
         var classesToGenerateInto = extensionClassDeclaration.Combine(methodDeclarations).Combine(options);
 
+        context.RegisterSourceOutput(
+            extensionClassesAndDiagnostics.SelectMany((r, _) => r.Errors),
+            static (ctx, info) => ctx.ReportDiagnostic(info)
+        );
         context.RegisterSourceOutput(classesToGenerateInto, (spc, extensionClass) => GenerateExtensionMethods(spc, in extensionClass));
     }
 
@@ -62,15 +72,32 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
 
     #region Extension method class
 
-    private static ClassForExtensions GetClassToGenerateInto(GeneratorAttributeSyntaxContext ctx, CancellationToken ct) {
+    private static Result<ClassForExtensions> GetClassToGenerateInto(GeneratorAttributeSyntaxContext ctx, CancellationToken ct) {
         _ = ct;
 
         var classSymbol = (INamedTypeSymbol)ctx.TargetSymbol;
 
-        var nameSpace = classSymbol.ContainingNamespace.IsGlobalNamespace ? "" : classSymbol.ContainingNamespace.ToString();
+        var @namespace = classSymbol.ContainingNamespace.IsGlobalNamespace ? "" : classSymbol.ContainingNamespace.ToString();
         var name = classSymbol.Name;
+        var hasPartialModifier = false;
 
-        return new ClassForExtensions(name, nameSpace);
+        
+        var classSyntax = (ClassDeclarationSyntax)ctx.TargetNode;
+        for (var i = 0; i < classSyntax.Modifiers.Count; i++) {
+            if (classSyntax.Modifiers[i].IsKind(SyntaxKind.PartialKeyword)) {
+                hasPartialModifier = true;
+                break;
+            }
+        }
+        
+        EquatableArray<DiagnosticInfo> errors;
+        if (!hasPartialModifier) {
+            errors = new EquatableArray<DiagnosticInfo>([NotPartialDiagnostic.Create(classSyntax)]);
+        } else {
+            errors = default;
+        }
+
+        return new Result<ClassForExtensions>(new ClassForExtensions(name, @namespace, hasPartialModifier), errors);
     }
 
     #endregion
@@ -305,6 +332,11 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
 
         foreach (var extensionClass in classes) {
             context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (!extensionClass.HasPartialModifier) {
+                //context.ReportDiagnostic(Diagnostic.Create( )
+                continue;
+            }
 
             var code = GenerateCode(in extensionClass, in methods, in data.Options, context.CancellationToken);
             var typeNamespace = extensionClass.Namespace;

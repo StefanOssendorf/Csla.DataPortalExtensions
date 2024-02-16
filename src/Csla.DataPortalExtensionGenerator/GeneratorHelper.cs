@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-[assembly: InternalsVisibleTo("Ossendorf.Csla.DataPortalExtensionGenerator.Tests")]
+//[assembly: InternalsVisibleTo("Ossendorf.Csla.DataPortalExtensionGenerator.Tests")]
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 internal static class GeneratorHelper {
@@ -31,10 +31,6 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator {{
     public class {MarkerAttributeNameWithSuffix} : global::System.Attribute {{
     }}
 }}";
-
-    // TODO: Think through how to best incorporate this into the 
-    //public static StringBuilder AppendNullableContextDependingOnTarget(this StringBuilder sb, Microsoft.CodeAnalysis.NullableAnnotation nullableAnnotation)
-    //    => sb.AppendLine("#nullable enable");
 
     public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate?> foundOperations, in GeneratorOptions options, CancellationToken ct) {
         const string intendation = "        ";
