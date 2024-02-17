@@ -68,4 +68,37 @@ namespace GeneratorTests {{
             IgnoredFiles = { "DataPortalExtensionsAttribute.g.cs" }
         };
     }
+
+    public static void Diagnostic(string portalExtensionClass, string expectedDiagnosticId) 
+        => Diagnostic(portalExtensionClass, "", expectedDiagnosticId);
+
+    public static void Diagnostic(string portalExtensionClass, string cslaClass, string expectedDiagnosticId) {
+        var syntaxTrees = new List<SyntaxTree>() {
+            CSharpSyntaxTree.ParseText(portalExtensionClass), // ExtensionClassTree
+        };
+        if (!string.IsNullOrWhiteSpace(cslaClass)) {
+            syntaxTrees.Add(CSharpSyntaxTree.ParseText(cslaClass)); // CslaContainingTypeTree
+        }
+
+        var references = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
+            .Select(a => MetadataReference.CreateFromFile(a.Location))
+            .Concat(new[] {
+                MetadataReference.CreateFromFile(typeof(FetchAttribute).Assembly.Location)
+            });
+
+        var compilation = CSharpCompilation.Create(
+                assemblyName: "GeneratorTests",
+                syntaxTrees: syntaxTrees,
+                references: references,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            );
+
+        var generator = new DataPortalExtensionGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+        diagnostics.Should().OnlyContain(d => d.Id == expectedDiagnosticId);
+    }
 }
