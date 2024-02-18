@@ -24,6 +24,8 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
         => context.RegisterPostInitializationOutput(ctx => ctx.AddSource("DataPortalExtensionsAttribute.g.cs", SourceText.From(GeneratorHelper.MarkerAttribute, Encoding.UTF8)));
 
     private void AddCodeGenerator(IncrementalGeneratorInitializationContext context) {
+        var options = GetGeneratorOptions(context);
+
         var extensionClassesAndDiagnostics = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: GeneratorHelper.FullyQalifiedNameOfMarkerAttribute,
@@ -31,19 +33,19 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
                 transform: GetClassToGenerateInto
             );
 
-        var methodDeclarations = context.SyntaxProvider
+        var extensionClassDeclaration = extensionClassesAndDiagnostics
+            .Select((r, _) => r.Value)
+            .Collect();
+
+        var methodDeclarationsAndDiagnostics = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: CouldBeCslaDataPortalAttribute,
                 transform: GetMethodInfoForGeneration
-            )
-            .Where(m => m is not null)!
-            .Collect();
+            );
 
-        var options = GetGeneratorOptions(context);
-
-        var extensionClassDeclaration = extensionClassesAndDiagnostics
-            .Where(static r => r.Errors.Count == 0)
-            .Select((r, _) => r.Value)
+        var methodDeclarations = methodDeclarationsAndDiagnostics
+            .Where(static m => m.Value.IsValid)
+            .Select((m, _) => m.Value.PortalOperationToGenerate)
             .Collect();
 
         var classesToGenerateInto = extensionClassDeclaration.Combine(methodDeclarations).Combine(options);
@@ -52,6 +54,11 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
             extensionClassesAndDiagnostics.SelectMany((r, _) => r.Errors),
             static (ctx, info) => ctx.ReportDiagnostic(info)
         );
+        context.RegisterSourceOutput(
+            methodDeclarationsAndDiagnostics.SelectMany((m,_) => m.Errors),
+            static (ctx, info) => ctx.ReportDiagnostic(info)
+        );
+
         context.RegisterSourceOutput(classesToGenerateInto, (spc, extensionClass) => GenerateExtensionMethods(spc, in extensionClass));
     }
 
@@ -115,39 +122,39 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
         return name is not null && GeneratorHelper.RecognizedCslaDataPortalAttributes.Keys.Contains(name);
     }
 
-    private PortalOperationToGenerate? GetMethodInfoForGeneration(GeneratorSyntaxContext ctx, CancellationToken ct) {
+    private Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)> GetMethodInfoForGeneration(GeneratorSyntaxContext ctx, CancellationToken ct) {
         var attributeSyntax = (AttributeSyntax)ctx.Node;
 
         if (attributeSyntax.Parent?.Parent is not MethodDeclarationSyntax methodDeclaration) {
-            return null;
+            return Result<PortalOperationToGenerate>.NotValid();
         }
 
         if (methodDeclaration.Parent is not ClassDeclarationSyntax classDeclaration) {
-            return null;
+            return Result<PortalOperationToGenerate>.NotValid();
         }
 
         ct.ThrowIfCancellationRequested();
 
         if (ctx.SemanticModel.GetTypeInfo(attributeSyntax).Type is not { ContainingNamespace.Name: "Csla" } attributeTypeInfo) {
-            return null;
+            return Result<PortalOperationToGenerate>.NotValid();
         }
 
         ct.ThrowIfCancellationRequested();
 
         if (ctx.SemanticModel.GetDeclaredSymbol(methodDeclaration, ct) is not IMethodSymbol methodSymbol) {
-            return null;
+            return Result<PortalOperationToGenerate>.NotValid();
         }
 
         ct.ThrowIfCancellationRequested();
 
         if (ctx.SemanticModel.GetDeclaredSymbol(classDeclaration, ct) is not INamedTypeSymbol classSymbol || classSymbol.ContainingNamespace.IsGlobalNamespace) {
-            return null;
+            return Result<PortalOperationToGenerate>.NotValid();
         }
 
         ct.ThrowIfCancellationRequested();
 
         if (!GeneratorHelper.RecognizedCslaDataPortalAttributes.TryGetValue(attributeTypeInfo.Name, out var dataPortalMethod)) {
-            return null;
+            return Result<PortalOperationToGenerate>.NotValid();
         }
 
         ct.ThrowIfCancellationRequested();
@@ -156,18 +163,21 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
         var methodName = methodDeclaration.Identifier.ToString();
 
         var hasNullableEnabled = false; // methodSymbol.ReceiverNullableAnnotation != NullableAnnotation.None;
-        var parameters = GetRelevantParametersForMethod(methodDeclaration, ctx.SemanticModel, ct);
+        var (parameters, diagnostics) = GetRelevantParametersForMethod(methodDeclaration, ctx.SemanticModel, ct, dataPortalMethod);
 
         var objectContainingPortalMethod = new PortalObject(objectHasPublicModifier, $"global::{classSymbol}");
-        return new PortalOperationToGenerate(methodName, parameters, hasNullableEnabled, dataPortalMethod, objectContainingPortalMethod);
+
+        var errors = new EquatableArray<DiagnosticInfo>([.. diagnostics]);
+        return new Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)>((new PortalOperationToGenerate(methodName, parameters, hasNullableEnabled, dataPortalMethod, objectContainingPortalMethod), true), errors);
     }
 
-    private EquatableArray<OperationParameter> GetRelevantParametersForMethod(MethodDeclarationSyntax methodSymbol, SemanticModel semanticModel, CancellationToken ct) {
-        var methodParameters = methodSymbol.ParameterList.Parameters;
+    private (EquatableArray<OperationParameter>, List<DiagnosticInfo>) GetRelevantParametersForMethod(MethodDeclarationSyntax methodSyntax, SemanticModel semanticModel, CancellationToken ct, DataPortalMethod dataPortalMethod) {
+        var methodParameters = methodSyntax.ParameterList.Parameters;
         if (methodParameters.Count == 0) {
-            return new EquatableArray<OperationParameter>();
+            return (EquatableArray<OperationParameter>.Empty, []);
         }
 
+        var diagnostics = new List<DiagnosticInfo>();
         var foundParameters = new List<OperationParameter>();
         for (var i = 0; i < methodParameters.Count; i++) {
             ct.ThrowIfCancellationRequested();
@@ -182,11 +192,13 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
                 continue;
             }
 
-            var hasPublicModifier = HasPublicVisibility(parameterTypeSymbol);
-            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), FormatForParameterUsage(parameter, parameterTypeSymbol), hasPublicModifier));
+            var hasPublicModifier = HasPublicVisibility(parameterTypeSymbol, diagnostics, dataPortalMethod, methodSyntax);
+            (var parametersFormattedForUsage, var errors) = FormatForParameterUsage(parameter, parameterTypeSymbol);
+            diagnostics.AddRange(errors);
+            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), parametersFormattedForUsage, hasPublicModifier));
         }
 
-        return new EquatableArray<OperationParameter>([.. foundParameters]);
+        return (new EquatableArray<OperationParameter>([.. foundParameters]), diagnostics);
 
         static bool IsInjectedParameter(ParameterSyntax parameter) {
             for (var i = 0; i < parameter.AttributeLists.Count; i++) {
@@ -204,16 +216,20 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
             return false;
         }
 
-        static bool HasPublicVisibility(ITypeSymbol typeSymbol) {
+        static bool HasPublicVisibility(ITypeSymbol typeSymbol, List<DiagnosticInfo> diagnostics, DataPortalMethod dataPortalMethod, MethodDeclarationSyntax methodSyntax) {
             if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol) {
                 typeSymbol = arrayTypeSymbol.ElementType;
+            }
+
+            if (typeSymbol.DeclaredAccessibility == Accessibility.Private) {
+                diagnostics.Add(PrivateClassCanNotBeAParameterDiagnostic.Create(methodSyntax, dataPortalMethod, methodSyntax.Identifier.ToString(), typeSymbol.ToDisplayString()));
             }
 
             return typeSymbol.DeclaredAccessibility == Accessibility.Public;
         }
     }
 
-    private static string FormatForParameterUsage(ParameterSyntax parameter, ITypeSymbol parameterTypeSymbol) {
+    private static (string, IEnumerable<DiagnosticInfo>) FormatForParameterUsage(ParameterSyntax parameter, ITypeSymbol parameterTypeSymbol) {
         var typeString = parameterTypeSymbol.ToString();
         switch (typeString) {
             case "string":
@@ -259,7 +275,7 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
             case "ushort?":
             case "object":
             case "object[]":
-                return parameter.ToString();
+                return (parameter.ToString(), Array.Empty<DiagnosticInfo>());
         }
 
         var typeStringBuilder = GetTypeString(parameterTypeSymbol);
@@ -275,7 +291,7 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
             //if (parameter.Default is EqualsValueClauseSyntax { Value.RawKind: NullLiteralExpression }) {
         }
 
-        return $"{typeStringBuilder} {parameterVariableName}";
+        return ($"{typeStringBuilder} {parameterVariableName}", Array.Empty<DiagnosticInfo>());
 
         static StringBuilder GetTypeString(ITypeSymbol typeSymbol, StringBuilder? sb = null) {
             sb ??= new();
@@ -323,7 +339,7 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
 
     #endregion
 
-    private static void GenerateExtensionMethods(SourceProductionContext context, in ((ImmutableArray<ClassForExtensions> Classes, ImmutableArray<PortalOperationToGenerate?> Methods) ClassesAndMethods, GeneratorOptions Options) data) {
+    private static void GenerateExtensionMethods(SourceProductionContext context, in ((ImmutableArray<ClassForExtensions> Classes, ImmutableArray<PortalOperationToGenerate> Methods) ClassesAndMethods, GeneratorOptions Options) data) {
         var classes = data.ClassesAndMethods.Classes;
         var methods = data.ClassesAndMethods.Methods;
         if (classes.IsDefaultOrEmpty || methods.IsDefaultOrEmpty) {
@@ -347,7 +363,7 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
             context.AddSource($"{typeNamespace}{extensionClass.Name}.g.cs", code);
         }
 
-        static string GenerateCode(in ClassForExtensions extensionClass, in ImmutableArray<PortalOperationToGenerate?> methods, in GeneratorOptions options, CancellationToken ct) {
+        static string GenerateCode(in ClassForExtensions extensionClass, in ImmutableArray<PortalOperationToGenerate> methods, in GeneratorOptions options, CancellationToken ct) {
 
             var ns = extensionClass.Namespace;
             var name = extensionClass.Name;

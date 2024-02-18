@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
+﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
 public class DiagnosticTests {
 
     private const string ValidExtensionClass = @$"

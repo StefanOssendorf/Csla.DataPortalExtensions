@@ -8,5 +8,5 @@ internal static class NotPartialDiagnostic {
     internal const string Title = "Must be partial";
 
     public static DiagnosticInfo Create(ClassDeclarationSyntax syntax)
-        => new(new DiagnosticDescriptor(Id, Title, Message, "Usage", defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true), syntax.GetLocation());
+        => new(new DiagnosticDescriptor(Id, Title, Message, "Usage", defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true), syntax.GetLocation());
 }

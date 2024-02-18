@@ -32,7 +32,7 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator {{
     }}
 }}";
 
-    public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate?> foundOperations, in GeneratorOptions options, CancellationToken ct) {
+    public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate> foundOperations, in GeneratorOptions options, CancellationToken ct) {
         const string intendation = "        ";
 
         var groupedByClass = foundOperations.Cast<PortalOperationToGenerate>().GroupBy(o => o.Object).ToImmutableArray();
