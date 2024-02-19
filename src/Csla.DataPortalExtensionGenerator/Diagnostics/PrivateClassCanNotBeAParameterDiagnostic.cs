@@ -10,5 +10,5 @@ internal static class PrivateClassCanNotBeAParameterDiagnostic {
     internal const string Title = "CSLA method parameters must not be private types.";
 
     public static DiagnosticInfo Create(MethodDeclarationSyntax syntax, DataPortalMethod dataPortalMethod, string methodName, string invalidClassType)
-        => new(new DiagnosticDescriptor(Id, Title, string.Format(CultureInfo.InvariantCulture, Message, dataPortalMethod.ToStringFast(), methodName, invalidClassType), "Usage", defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true), syntax.GetLocation());
+        => new(new DiagnosticDescriptor(Id, Title, string.Format(CultureInfo.InvariantCulture, Message, dataPortalMethod.ToStringFast(), methodName, invalidClassType), "Usage", defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true), syntax.GetLocation());
 }
