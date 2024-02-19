@@ -12,7 +12,7 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 /// The data portal extension source generator.
 /// </summary>
 [Generator]
-public class DataPortalExtensionGenerator : IIncrementalGenerator {
+public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator {
 
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context) {
@@ -20,26 +20,27 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
         AddCodeGenerator(context);
     }
 
-    private void AddMarkerAttribute(IncrementalGeneratorInitializationContext context)
+    private static void AddMarkerAttribute(IncrementalGeneratorInitializationContext context)
         => context.RegisterPostInitializationOutput(ctx => ctx.AddSource("DataPortalExtensionsAttribute.g.cs", SourceText.From(GeneratorHelper.MarkerAttribute, Encoding.UTF8)));
 
-    private void AddCodeGenerator(IncrementalGeneratorInitializationContext context) {
+    private static void AddCodeGenerator(IncrementalGeneratorInitializationContext context) {
         var options = GetGeneratorOptions(context);
 
         var extensionClassesAndDiagnostics = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: GeneratorHelper.FullyQalifiedNameOfMarkerAttribute,
                 predicate: static (node, _) => node is ClassDeclarationSyntax,
-                transform: GetClassToGenerateInto
+                transform: Parser.GetExtensionClass
             );
 
         var extensionClassDeclaration = extensionClassesAndDiagnostics
             .Select((r, _) => r.Value)
-            .Collect();
+            .Collect()
+            ;
 
         var methodDeclarationsAndDiagnostics = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: CouldBeCslaDataPortalAttribute,
+                predicate: Parser.CouldBeCslaDataPortalAttribute,
                 transform: GetMethodInfoForGeneration
             );
 
@@ -59,7 +60,10 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
             static (ctx, info) => ctx.ReportDiagnostic(info)
         );
 
-        context.RegisterSourceOutput(classesToGenerateInto, (spc, extensionClass) => GenerateExtensionMethods(spc, in extensionClass));
+        context.RegisterSourceOutput(
+            classesToGenerateInto, 
+            (spc, extensionClass) => GenerateExtensionMethods(spc, in extensionClass)
+        );
     }
 
     private static IncrementalValueProvider<GeneratorOptions> GetGeneratorOptions(IncrementalGeneratorInitializationContext context) {
@@ -77,52 +81,11 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
         });
     }
 
-    #region Extension method class
-
-    private static Result<ClassForExtensions> GetClassToGenerateInto(GeneratorAttributeSyntaxContext ctx, CancellationToken ct) {
-        _ = ct;
-
-        var classSymbol = (INamedTypeSymbol)ctx.TargetSymbol;
-
-        var @namespace = classSymbol.ContainingNamespace.IsGlobalNamespace ? "" : classSymbol.ContainingNamespace.ToString();
-        var name = classSymbol.Name;
-        var hasPartialModifier = false;
-
-        
-        var classSyntax = (ClassDeclarationSyntax)ctx.TargetNode;
-        for (var i = 0; i < classSyntax.Modifiers.Count; i++) {
-            if (classSyntax.Modifiers[i].IsKind(SyntaxKind.PartialKeyword)) {
-                hasPartialModifier = true;
-                break;
-            }
-        }
-        
-        EquatableArray<DiagnosticInfo> errors;
-        if (!hasPartialModifier) {
-            errors = new EquatableArray<DiagnosticInfo>([NotPartialDiagnostic.Create(classSyntax)]);
-        } else {
-            errors = default;
-        }
-
-        return new Result<ClassForExtensions>(new ClassForExtensions(name, @namespace, hasPartialModifier), errors);
-    }
-
-    #endregion
-
     #region Csla methods
 
-    private static bool CouldBeCslaDataPortalAttribute(SyntaxNode node, CancellationToken _) {
+    
 
-        if (node is not AttributeSyntax attribute) {
-            return false;
-        }
-
-        var name = GeneratorHelper.ExtractAttributeName(attribute.Name);
-
-        return name is not null && GeneratorHelper.RecognizedCslaDataPortalAttributes.Keys.Contains(name);
-    }
-
-    private Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)> GetMethodInfoForGeneration(GeneratorSyntaxContext ctx, CancellationToken ct) {
+    private static Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)> GetMethodInfoForGeneration(GeneratorSyntaxContext ctx, CancellationToken ct) {
         var attributeSyntax = (AttributeSyntax)ctx.Node;
 
         if (attributeSyntax.Parent?.Parent is not MethodDeclarationSyntax methodDeclaration) {
@@ -171,7 +134,7 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
         return new Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)>((new PortalOperationToGenerate(methodName, parameters, hasNullableEnabled, dataPortalMethod, objectContainingPortalMethod), true), errors);
     }
 
-    private (EquatableArray<OperationParameter>, List<DiagnosticInfo>) GetRelevantParametersForMethod(MethodDeclarationSyntax methodSyntax, SemanticModel semanticModel, CancellationToken ct, DataPortalMethod dataPortalMethod) {
+    private static (EquatableArray<OperationParameter>, List<DiagnosticInfo>) GetRelevantParametersForMethod(MethodDeclarationSyntax methodSyntax, SemanticModel semanticModel, CancellationToken ct, DataPortalMethod dataPortalMethod) {
         var methodParameters = methodSyntax.ParameterList.Parameters;
         if (methodParameters.Count == 0) {
             return (EquatableArray<OperationParameter>.Empty, []);
@@ -214,6 +177,18 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
             }
 
             return false;
+
+            static string EnsureAttributeSuffix(string attributeName) {
+                if (string.IsNullOrWhiteSpace(attributeName)) {
+                    return "";
+                }
+
+                if (attributeName.EndsWith("Attribute")) {
+                    return attributeName;
+                }
+
+                return $"{attributeName}Attribute";
+            }
         }
 
         static bool HasPublicVisibility(ITypeSymbol typeSymbol, List<DiagnosticInfo> diagnostics, DataPortalMethod dataPortalMethod, MethodDeclarationSyntax methodSyntax) {
@@ -391,17 +366,5 @@ public class DataPortalExtensionGenerator : IIncrementalGenerator {
 
             return sb.ToString();
         }
-    }
-
-    private static string EnsureAttributeSuffix(string attributeName) {
-        if (string.IsNullOrWhiteSpace(attributeName)) {
-            return "";
-        }
-
-        if (attributeName.EndsWith("Attribute")) {
-            return attributeName;
-        }
-
-        return $"{attributeName}Attribute";
     }
 }

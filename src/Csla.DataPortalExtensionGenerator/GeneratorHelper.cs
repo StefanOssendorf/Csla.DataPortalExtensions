@@ -1,9 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
 using System.Text;
-
-//[assembly: InternalsVisibleTo("Ossendorf.Csla.DataPortalExtensionGenerator.Tests")]
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 internal static class GeneratorHelper {
