@@ -1,9 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
 using System.Text;
-
-[assembly: InternalsVisibleTo("Ossendorf.Csla.DataPortalExtensionGenerator.Tests")]
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 internal static class GeneratorHelper {
@@ -32,11 +29,7 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator {{
     }}
 }}";
 
-    // TODO: Think through how to best incorporate this into the 
-    //public static StringBuilder AppendNullableContextDependingOnTarget(this StringBuilder sb, Microsoft.CodeAnalysis.NullableAnnotation nullableAnnotation)
-    //    => sb.AppendLine("#nullable enable");
-
-    public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate?> foundOperations, in GeneratorOptions options, CancellationToken ct) {
+    public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate> foundOperations, in GeneratorOptions options, CancellationToken ct) {
         const string intendation = "        ";
 
         var groupedByClass = foundOperations.Cast<PortalOperationToGenerate>().GroupBy(o => o.Object).ToImmutableArray();

@@ -31,8 +31,8 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
     }
 
     [Fetch]
-    private void FetchX(int id) {
-
+    private void FetchX(int id, ParamDummy dummy) {
+        _ = dummy;
         using (BypassPropertyChecks) {
             Id = id;
         }
@@ -73,5 +73,11 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
         //childPortal.CreateChildAsync
         //childPortal.FetchChildAsync
         //childPortal.UpdateChildAsync
+    }
+
+    // Make private to test DPEGEN002 diagnostic
+    [Serializable]
+    public class ParamDummy {
+
     }
 }

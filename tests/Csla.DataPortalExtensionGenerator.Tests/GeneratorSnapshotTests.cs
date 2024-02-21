@@ -391,4 +391,28 @@ public enum SomeEnum {{
 
         return TestHelper.Verify(cslaSource, someEnumSource);
     }
+
+    [Fact]
+    public Task TwoClassesToGenerateInto() {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(int krznbf) {{
+    }}
+}}
+";
+
+        var additionalClassToGenerateInto = $@"
+namespace GeneratorTests2 {{
+    [Ossendorf.Csla.DataPortalExtensionGenerator.DataPortalExtensionsAttribute]
+    public static partial class DataPortalExtensions2 {{
+    }}
+}}";
+
+        return TestHelper.Verify(cslaSource, additionalClassToGenerateInto, 3);
+    }
 }
