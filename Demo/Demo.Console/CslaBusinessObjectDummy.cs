@@ -75,7 +75,8 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
         //childPortal.UpdateChildAsync
     }
 
-    // Make public to test DPEGEN002 diagnostic
+    // Make private to test DPEGEN002 diagnostic
+    [Serializable]
     public class ParamDummy {
 
     }
