@@ -14,13 +14,15 @@ namespace GeneratorTests {{
     }}
 }}";
 
-    public static Task Verify(string cslaSource) => Verify(cslaSource, s => s);
+    public static Task Verify(string cslaSource) => Verify(cslaSource, "");
 
-    public static Task Verify(string cslaSource, string additionalSource) => Verify(cslaSource, additionalSource, s => s);
+    public static Task Verify(string cslaSource, string additionalSource) => Verify(cslaSource, additionalSource, 2);
 
-    public static Task Verify(string cslaSource, Func<SettingsTask, SettingsTask> configureVerify) => Verify(cslaSource, "", configureVerify);
+    public static Task Verify(string cslaSource, string additionalSource, int expectedFileCount) => Verify(cslaSource, additionalSource, s => s, expectedFileCount);
 
-    public static Task Verify(string cslaSource, string additionalSource, Func<SettingsTask, SettingsTask> configureVerify) {
+    public static Task Verify(string cslaSource, Func<SettingsTask, SettingsTask> configureVerify) => Verify(cslaSource, "", configureVerify, 2);
+
+    public static Task Verify(string cslaSource, string additionalSource, Func<SettingsTask, SettingsTask> configureVerify, int expectedFileCount) {
 
         var syntaxTrees = new List<SyntaxTree>() {
             CSharpSyntaxTree.ParseText(ClassToGenerateExtensionsInto), // ExtensionClassTree
@@ -53,16 +55,16 @@ namespace GeneratorTests {{
 
         outputCompilation.GetDiagnostics().Should().BeEmpty();
         return configureVerify(
-            Verifier.Verify(CreateResultFromRun(driver))
+            Verifier.Verify(CreateResultFromRun(driver, expectedFileCount))
                 .UseDirectory("Snapshots")
                 .ScrubLinesContaining(StringComparison.Ordinal, ".GeneratedCode(\"Ossendorf.Csla.Dataportal")
         //.AutoVerify()
         );
     }
 
-    private static RunResultWithIgnoreList CreateResultFromRun(GeneratorDriver driver) {
+    private static RunResultWithIgnoreList CreateResultFromRun(GeneratorDriver driver, int expectedFileCount) {
         var result = driver.GetRunResult();
-        _ = result.GeneratedTrees.Length.Should().Be(2, "The generated code must contain the attribute and the generated extenion class.");
+        _ = result.GeneratedTrees.Length.Should().Be(expectedFileCount, "The generated code must contain the attribute and the generated extension class.");
         return new RunResultWithIgnoreList {
             Result = result,
             IgnoredFiles = { "DataPortalExtensionsAttribute.g.cs" }
