@@ -91,8 +91,6 @@ With this added the consuming project the generator picks the values up and adds
 - Special case commands to an extension like `commandPortal.ExecuteCommand(<params>)` which combines `Create`+`Execute`.
 - Support for generic business objects
 - Add attribute to exclude methods explicitly
-- Add diagnostics
-    - Wrong config setting (if possible)
 
 A lot of implementation details are derived/taken from the great series [Andrew Lock: Creating a source generator](https://andrewlock.net/series/creating-a-source-generator/). If you want to create your own source generator I can recommend that series wholeheartedly.
 
