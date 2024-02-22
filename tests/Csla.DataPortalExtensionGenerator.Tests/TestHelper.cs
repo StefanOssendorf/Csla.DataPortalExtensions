@@ -1,7 +1,10 @@
 ﻿using Csla;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
 
@@ -14,15 +17,23 @@ namespace GeneratorTests {{
     }}
 }}";
 
-    public static Task Verify(string cslaSource) => Verify(cslaSource, "");
+    public static Task Verify(string cslaSource) => Verify(cslaSource, true);
 
-    public static Task Verify(string cslaSource, string additionalSource) => Verify(cslaSource, additionalSource, 2);
+    public static Task Verify(string cslaSource, TestAnalyzerConfigOptionsProvider globalCompilerOptions) => Verify(cslaSource, "", t => t, 2, true, globalCompilerOptions);
 
-    public static Task Verify(string cslaSource, string additionalSource, int expectedFileCount) => Verify(cslaSource, additionalSource, s => s, expectedFileCount);
+    public static Task Verify(string cslaSource, bool enableNullableContext) => Verify(cslaSource, "", enableNullableContext);
 
-    public static Task Verify(string cslaSource, Func<SettingsTask, SettingsTask> configureVerify) => Verify(cslaSource, "", configureVerify, 2);
+    public static Task Verify(string cslaSource, string additionalSource) => Verify(cslaSource, additionalSource, true);
 
-    public static Task Verify(string cslaSource, string additionalSource, Func<SettingsTask, SettingsTask> configureVerify, int expectedFileCount) {
+    public static Task Verify(string cslaSource, string additionalSource, bool enableNullableContext) => Verify(cslaSource, additionalSource, 2, enableNullableContext);
+
+    public static Task Verify(string cslaSource, string additionalSource, int expectedFileCount) => Verify(cslaSource, additionalSource, expectedFileCount, true);
+
+    public static Task Verify(string cslaSource, string additionalSource, int expectedFileCount, bool enableNullableContext) => Verify(cslaSource, additionalSource, s => s, expectedFileCount, enableNullableContext);
+
+    public static Task Verify(string cslaSource, Func<SettingsTask, SettingsTask> configureVerify) => Verify(cslaSource, "", configureVerify, 2, true);
+
+    public static Task Verify(string cslaSource, string additionalSource, Func<SettingsTask, SettingsTask> configureVerify, int expectedFileCount, bool enableNullableContext, TestAnalyzerConfigOptionsProvider? globalCompilerOptions = null) {
 
         var syntaxTrees = new List<SyntaxTree>() {
             CSharpSyntaxTree.ParseText(ClassToGenerateExtensionsInto), // ExtensionClassTree
@@ -44,21 +55,25 @@ namespace GeneratorTests {{
                 assemblyName: "GeneratorTests",
                 syntaxTrees: syntaxTrees,
                 references: references,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithNullableContextOptions(enableNullableContext ? NullableContextOptions.Enable : NullableContextOptions.Disable)
             );
 
         var generator = new DataPortalExtensionGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        var driver = CSharpGeneratorDriver.Create(generator).WithUpdatedAnalyzerConfigOptions(globalCompilerOptions ?? TestAnalyzerConfigOptionsProvider.Empty);
 
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var _);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
 
-        outputCompilation.GetDiagnostics().Should().BeEmpty();
+        using (new AssertionScope()) {
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            diagnostics.Should().BeEmpty();
+        }
+
         return configureVerify(
             Verifier.Verify(CreateResultFromRun(driver, expectedFileCount))
                 .UseDirectory("Snapshots")
                 .ScrubLinesContaining(StringComparison.Ordinal, ".GeneratedCode(\"Ossendorf.Csla.Dataportal")
-        //.AutoVerify()
+            //.AutoVerify()
         );
     }
 
@@ -74,7 +89,13 @@ namespace GeneratorTests {{
     public static void Diagnostic(string portalExtensionClass, string expectedDiagnosticId) 
         => Diagnostic(portalExtensionClass, "", expectedDiagnosticId);
 
-    public static void Diagnostic(string portalExtensionClass, string cslaClass, string expectedDiagnosticId) {
+    public static void Diagnostic(string portalExtensionClass, string cslaClass, string expectedDiagnosticId) 
+        => Diagnostic(portalExtensionClass, cslaClass, null, diagnostics => diagnostics.Should().OnlyContain(d => d.Id == expectedDiagnosticId), d => { });
+
+    public static void Diagnostic(string validExtensionClass, string cslaClass, string expectedDiagnosticId, TestAnalyzerConfigOptionsProvider globalCompilerOptions)
+        => Diagnostic(validExtensionClass, cslaClass, globalCompilerOptions, diagnostics => diagnostics.Should().OnlyContain(d => d.Id == expectedDiagnosticId), d => { });
+
+    public static void Diagnostic(string portalExtensionClass, string cslaClass, AnalyzerConfigOptionsProvider? globalConfigOptionsProvider, Action<IEnumerable<Diagnostic>> sourceGenReportedDiagnostics, Action<IEnumerable<Diagnostic>> compilerReportedDiagnostics, NullableContextOptions nullableContextOptions = NullableContextOptions.Enable) {
         var syntaxTrees = new List<SyntaxTree>() {
             CSharpSyntaxTree.ParseText(portalExtensionClass), // ExtensionClassTree
         };
@@ -93,14 +114,17 @@ namespace GeneratorTests {{
                 assemblyName: "GeneratorTests",
                 syntaxTrees: syntaxTrees,
                 references: references,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithNullableContextOptions(nullableContextOptions)
             );
 
         var generator = new DataPortalExtensionGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        var driver = CSharpGeneratorDriver.Create(generator).WithUpdatedAnalyzerConfigOptions(globalConfigOptionsProvider ?? TestAnalyzerConfigOptionsProvider.Empty);
 
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-        diagnostics.Should().OnlyContain(d => d.Id == expectedDiagnosticId);
+        using (new AssertionScope()) {
+            sourceGenReportedDiagnostics(diagnostics);
+            compilerReportedDiagnostics(outputCompilation.GetDiagnostics());
+        }
     }
 }
