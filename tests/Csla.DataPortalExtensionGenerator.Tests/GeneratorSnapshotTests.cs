@@ -150,7 +150,7 @@ namespace MyTest.Greats;
 
 public class Foo {{
     public class Bar {{
-        public string Name {{ get; set; }}
+        public string Name {{ get; set; }} = """";
     }}
 }}
 ";
@@ -188,6 +188,24 @@ namespace VerifyTests;
 public class DummyBOWithParams {{
     [Fetch]
     private void Bar({type}? krznbf) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
+    }
+
+    [Theory]
+    [MemberData(nameof(CSharpBuiltInTypesNullable))]
+    public Task NullablePrimitivesArray(string type) {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar({type}[]? krznbf = null) {{
     }}
 }}
 ";
@@ -233,9 +251,9 @@ public class DummyBOWithParams {{
 namespace GenericTests;
 
 public class TestGenerica<T1,T2,T3> {{
-    public T1 Type1 {{ get; set; }}
-    public T2 Type2 {{ get; set; }}
-    public T3 Type3 {{ get; set; }}
+    public T1? Type1 {{ get; set; }}
+    public T2? Type2 {{ get; set; }}
+    public T3? Type3 {{ get; set; }}
 }}
 
 public class RandomClass {{
@@ -340,7 +358,7 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    private void Bar(string a, int b = 1, List<string> list = null, string x = null, string z = """") {{
+    private void Bar(string a, int b = 1, List<string>? list = null, string? x = null, string z = """") {{
     }}
 }}
 ";
@@ -357,12 +375,12 @@ namespace VerifyTests;
 
 public class DummyBOWithParams {{
     [Fetch]
-    private void Bar(string a, int b = 1, int[] c = null, string x = null) {{
+    private void Bar(string a, int b = 1, int[]? c = null, string? x = null) {{
     }}
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return TestHelper.Verify(cslaSource, true);
     }
 
     [Fact]
@@ -414,5 +432,41 @@ namespace GeneratorTests2 {{
 }}";
 
         return TestHelper.Verify(cslaSource, additionalClassToGenerateInto, 3);
+    }
+
+    [Fact]
+    public Task PrefixConfig() {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(int krznbf) {{
+    }}
+}}
+";
+
+        var globalCompilerOptions = TestAnalyzerConfigOptionsProvider.Create("DataPortalExtensionGen_MethodPrefix", "Prefix");
+        return TestHelper.Verify(cslaSource, globalCompilerOptions);
+    }
+
+    [Fact]
+    public Task SuffixConfig() {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar(int krznbf) {{
+    }}
+}}
+";
+
+        var globalCompilerOptions = TestAnalyzerConfigOptionsProvider.Create("DataPortalExtensionGen_MethodSuffix", "Suffix");
+        return TestHelper.Verify(cslaSource, globalCompilerOptions);
     }
 }

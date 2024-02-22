@@ -65,8 +65,10 @@ static partial class DataPortalExtensions {
 ## How to configure the generator
 
 You can configure the following for the generator to respect
-* method prefix
-* method suffix
+* method prefix (default = "")
+* method suffix (default = "")
+* Enable/Disable nullable annotation context (default = Enable)
+* SuppressWarningCS8669 (default = false)
 
 The fetch named method example from above can be resolved with a prefix/suffix to generate a method with the name `YourFetch` which in turn can be used and provides reliable compiler support.
 
@@ -75,6 +77,8 @@ You can add the following properties to your csproj-file to configure the genera
 <PropertyGroup>
     <DataPortalExtensionGen_MethodPrefix>Prefix</DataPortalExtensionGen_MethodPrefix>
     <DataPortalExtensionGen_MethodSuffix>Suffix</DataPortalExtensionGen_MethodSuffix>
+    <DataPortalExtensionGen_NullableContext>Enable/Disable</DataPortalExtensionGen_NullableContext>
+    <DataPortalExtensionGen_SuppressWarningCS8669>true/false</DataPortalExtensionGen_SuppressWarningCS8669>
 </PropertyGroup>
 ```
 
@@ -87,12 +91,6 @@ With this added the consuming project the generator picks the values up and adds
 - Special case commands to an extension like `commandPortal.ExecuteCommand(<params>)` which combines `Create`+`Execute`.
 - Support for generic business objects
 - Add attribute to exclude methods explicitly
-- Add proper NullableAnnotationContext settings
-- Add diagnostics
-    - Wrong usage/configuration
-        - Like extension class is not partial
-    - Wrong config setting (if possible)
-    - Detailed error when a private nested class is used for any csla method
 
 A lot of implementation details are derived/taken from the great series [Andrew Lock: Creating a source generator](https://andrewlock.net/series/creating-a-source-generator/). If you want to create your own source generator I can recommend that series wholeheartedly.
 

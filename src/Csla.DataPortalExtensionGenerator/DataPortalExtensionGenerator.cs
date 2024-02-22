@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
@@ -22,7 +23,10 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
         => context.RegisterPostInitializationOutput(ctx => ctx.AddSource("DataPortalExtensionsAttribute.g.cs", SourceText.From(GeneratorHelper.MarkerAttribute, Encoding.UTF8)));
 
     private static void AddCodeGenerator(IncrementalGeneratorInitializationContext context) {
-        var options = GetGeneratorOptions(context);
+        var optionsAndDiagnostics = GetGeneratorOptions(context);
+
+        var options = optionsAndDiagnostics
+            .Select((o, _) => o.Value);
 
         var extensionClassesAndDiagnostics = context.SyntaxProvider
             .ForAttributeWithMetadataName(
@@ -55,6 +59,10 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
             methodDeclarationsAndDiagnostics.SelectMany((m, _) => m.Errors),
             static (ctx, info) => ctx.ReportDiagnostic(info)
         );
+        context.RegisterSourceOutput(
+            optionsAndDiagnostics.SelectMany((o, _) => o.Errors),
+            static (ctx, info) => ctx.ReportDiagnostic(info)
+        );
 
         context.RegisterSourceOutput(
             source: classesToGenerateInto,
@@ -62,18 +70,38 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
         );
     }
 
-    private static IncrementalValueProvider<GeneratorOptions> GetGeneratorOptions(IncrementalGeneratorInitializationContext context) {
+    private static IncrementalValueProvider<Result<GeneratorOptions>> GetGeneratorOptions(IncrementalGeneratorInitializationContext context) {
         return context.AnalyzerConfigOptionsProvider.Select((options, _) => {
 
-            if (!options.GlobalOptions.TryGetValue("build_property.DataPortalExtensionGen_MethodPrefix", out var methodPrefix) || methodPrefix is null) {
+            if (!TryGetGlobalOption(ConfigConstants.MethodPrefix, out var methodPrefix) || methodPrefix is null) {
                 methodPrefix = "";
             }
 
-            if (!options.GlobalOptions.TryGetValue("build_property.DataPortalExtensionGen_MethodSuffix", out var methodSuffix) || methodSuffix is null) {
+            if (!TryGetGlobalOption(ConfigConstants.MethodSuffix, out var methodSuffix) || methodSuffix is null) {
                 methodSuffix = "";
             }
 
-            return new GeneratorOptions(methodPrefix, methodSuffix);
+            var errors = new List<DiagnosticInfo>();
+            var nullableContextOptions = NullableContextOptions.Enable;
+            if (TryGetGlobalOption(ConfigConstants.NullableContext, out var nullabilityContext)) {
+                if (nullabilityContext.Equals("Disable", StringComparison.OrdinalIgnoreCase)) {
+                    nullableContextOptions = NullableContextOptions.Disable;
+                } else if (!nullabilityContext.Equals("Enable", StringComparison.OrdinalIgnoreCase)) {
+                    errors.Add(NullableContextValueDiagnostic.Create(nullabilityContext));
+                }
+            }
+
+            var suppressWarningCS8669 = false;
+            if (TryGetGlobalOption(ConfigConstants.SuppressWarningCS8669, out var suppressWarningString)) {
+                if (!bool.TryParse(suppressWarningString, out suppressWarningCS8669)) {
+                    suppressWarningCS8669 = false;
+                    errors.Add(SuppressWarningCS8669ValueDiagnostic.Create(suppressWarningString));
+                }
+            }
+
+            return new Result<GeneratorOptions>(new GeneratorOptions(methodPrefix, methodSuffix, nullableContextOptions, suppressWarningCS8669), new EquatableArray<DiagnosticInfo>([.. errors]));
+
+            bool TryGetGlobalOption(string key, [NotNullWhen(true)] out string? value) => options.GlobalOptions.TryGetValue($"build_property.{key}", out value);
         });
     }
 }

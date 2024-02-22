@@ -2,5 +2,7 @@
     <ItemGroup>
         <CompilerVisibleProperty Include="DataPortalExtensionGen_MethodPrefix" />
         <CompilerVisibleProperty Include="DataPortalExtensionGen_MethodSuffix" />
+        <CompilerVisibleProperty Include="DataPortalExtensionGen_NullableContext" />
+        <CompilerVisibleProperty Include="DataPortalExtensionGen_SuppressWarningCS8669" />
     </ItemGroup>
 </Project>

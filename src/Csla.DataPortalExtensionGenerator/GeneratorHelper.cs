@@ -1,8 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Immutable;
-using System.Text;
-
-namespace Ossendorf.Csla.DataPortalExtensionGenerator;
+﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 internal static class GeneratorHelper {
 
     public const string FullyQalifiedNameOfMarkerAttribute = "Ossendorf.Csla.DataPortalExtensionGenerator.DataPortalExtensionsAttribute";
@@ -28,90 +24,6 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator {{
     public class {MarkerAttributeNameWithSuffix} : global::System.Attribute {{
     }}
 }}";
-
-    public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate> foundOperations, in GeneratorOptions options, CancellationToken ct) {
-        const string intendation = "        ";
-
-        var groupedByClass = foundOperations.Cast<PortalOperationToGenerate>().GroupBy(o => o.Object).ToImmutableArray();
-
-        foreach (var operationsByClass in groupedByClass) {
-            ct.ThrowIfCancellationRequested();
-
-            if (!operationsByClass.Any()) {
-                continue;
-            }
-
-            var boName = operationsByClass.Key.GloballyQualifiedName;
-
-            foreach (var operation in operationsByClass) {
-                ct.ThrowIfCancellationRequested();
-
-                var childPrefix = IsChildMethod(operation.PortalMethod) ? "Child" : "";
-                string returnType;
-                if (operation.PortalMethod is DataPortalMethod.Delete) {
-                    returnType = "Task";
-                } else {
-                    returnType = $"Task<{boName}>";
-                }
-
-                var (parameters, arguments) = GetParametersAndArgumentsToUse(operation.Parameters, ct);
-
-                var visibilityModifier = operationsByClass.Key.HasPublicModifier && operation.Parameters.All(p => p.IsPublic) ? "public" : "internal";
-
-                _ = sb.Append(intendation)
-                    .Append(visibilityModifier).Append(" static ")
-                    .Append("global::System.Threading.Tasks.").Append(returnType).Append(" ").Append(options.MethodPrefix).Append(operation.MethodName).Append(options.MethodSuffix)
-                    .Append("(this global::Csla.I").Append(childPrefix).Append("DataPortal<").Append(boName).Append("> ")
-                    .Append("portal").Append(parameters).Append(")")
-                    .Append(" => portal.").Append(operation.PortalMethod.ToStringFast()).Append("Async")
-                    .Append("(").Append(arguments).Append(");").AppendLine();
-            }
-        }
-
-        return sb;
-
-        static bool IsChildMethod(DataPortalMethod portalMethod) {
-            return portalMethod switch {
-                DataPortalMethod.FetchChild or DataPortalMethod.CreateChild => true,
-                DataPortalMethod.Fetch or DataPortalMethod.Delete or DataPortalMethod.Create or DataPortalMethod.Execute => false,
-                _ => throw new InvalidOperationException($"Unknown dataportal method {portalMethod}"),
-            };
-        }
-    }
-
-    private static (StringBuilder Parameters, StringBuilder Arguments) GetParametersAndArgumentsToUse(EquatableArray<OperationParameter> parameters, CancellationToken ct) {
-        var parametersBuilder = new StringBuilder();
-        var argumentsBuilder = new StringBuilder();
-        if (parameters.Count == 0) {
-            return (parametersBuilder, argumentsBuilder);
-        }
-
-        foreach (var parameter in parameters) {
-            ct.ThrowIfCancellationRequested();
-
-            if (parametersBuilder.Length > 0) {
-                parametersBuilder.Append(", ");
-                argumentsBuilder.Append(", ");
-            }
-
-            parametersBuilder.Append(parameter.ParameterFormatted);
-            argumentsBuilder.Append(parameter.ArgumentFormatted);
-        }
-
-        if (parametersBuilder.Length > 0) {
-            parametersBuilder.Insert(0, ", ");
-        }
-
-        return (parametersBuilder, argumentsBuilder);
-    }
-
-    public static string ExtractAttributeName(NameSyntax? name) {
-        return name switch {
-            SimpleNameSyntax ins => ins.Identifier.Text,
-            QualifiedNameSyntax qns => qns.Right.Identifier.Text,
-            _ => ""
-        };
-    }
 
     private static readonly Dictionary<string, DataPortalMethod> _methodTranslations = [];
     static GeneratorHelper() {

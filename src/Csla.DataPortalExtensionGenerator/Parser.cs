@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
@@ -45,7 +46,7 @@ internal static class Parser {
             return false;
         }
 
-        var name = GeneratorHelper.ExtractAttributeName(attribute.Name);
+        var name = ExtractAttributeName(attribute.Name);
 
         return name is not null && GeneratorHelper.RecognizedCslaDataPortalAttributes.Keys.Contains(name);
     }
@@ -79,9 +80,8 @@ internal static class Parser {
         var parameters = GetRelevantParametersForMethod(methodDeclaration, ctx.SemanticModel, ct, dataPortalMethod, diagnostics);
         var errors = new EquatableArray<DiagnosticInfo>([.. diagnostics]);
 
-        var hasNullableEnabled = false;
         var methodName = methodDeclaration.Identifier.ToString();
-        return new Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)>((new PortalOperationToGenerate(methodName, parameters, hasNullableEnabled, dataPortalMethod, portalObject.Value), true), errors);
+        return new Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)>((new PortalOperationToGenerate(methodName, parameters, dataPortalMethod, portalObject.Value), true), errors);
     }
 
     private static bool GetPortalObject(SyntaxNode? classDeclarationNode, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out PortalObject? portalObject) {
@@ -121,8 +121,12 @@ internal static class Parser {
                 continue;
             }
 
+            if (semanticModel.GetDeclaredSymbol(parameter, ct) is not IParameterSymbol parameterDeclaredSymbol) {
+                continue;
+            }
+
             var hasPublicModifier = HasPublicVisibility(parameterTypeSymbol, diagnostics, dataPortalMethod, methodSyntax);
-            var parametersFormattedForUsage = FormatForParameterUsage(parameter, parameterTypeSymbol);
+            var parametersFormattedForUsage = FormatForParameterUsage(parameter, parameterTypeSymbol, parameterDeclaredSymbol);
             foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), parametersFormattedForUsage, hasPublicModifier));
         }
 
@@ -134,7 +138,7 @@ internal static class Parser {
                 for (var j = 0; j < al.Attributes.Count; j++) {
                     var attr = al.Attributes[j];
 
-                    var attrName = EnsureAttributeSuffix(GeneratorHelper.ExtractAttributeName(attr.Name));
+                    var attrName = EnsureAttributeSuffix(ExtractAttributeName(attr.Name));
                     if (attrName.Equals("InjectAttribute", StringComparison.Ordinal)) {
                         return true;
                     }
@@ -169,8 +173,9 @@ internal static class Parser {
         }
     }
 
-    private static string FormatForParameterUsage(ParameterSyntax parameter, ITypeSymbol parameterTypeSymbol) {
+    private static string FormatForParameterUsage(ParameterSyntax parameter, ITypeSymbol parameterTypeSymbol, IParameterSymbol parameterDeclaredSymbol) {
         var typeString = parameterTypeSymbol.ToString();
+#pragma warning disable IDE0066 // Convert switch statement to expression, This is more readable than the switch-expression
         switch (typeString) {
             case "string":
             case "string[]":
@@ -217,65 +222,23 @@ internal static class Parser {
             case "object[]":
                 return parameter.ToString();
         }
+#pragma warning restore IDE0066 // Convert switch statement to expression
 
-        var typeStringBuilder = GetTypeString(parameterTypeSymbol);
-
-        var parameterVariableName = parameter.Identifier.ToString();
-        if (parameter.Default is not null) {
-            if (parameterTypeSymbol is { TypeKind: TypeKind.Enum } && parameter.Default.Value is MemberAccessExpressionSyntax valueOfEnum) {
-                parameterVariableName += $" = {typeStringBuilder}.{valueOfEnum.Name}";
-            } else {
-                parameterVariableName += $" {parameter.Default}";
-            }
-            //const int NullLiteralExpression = 8754; // See https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp.syntaxkind?view=roslyn-dotnet-4.7.0#microsoft-codeanalysis-csharp-syntaxkind-nullliteralexpression
-            //if (parameter.Default is EqualsValueClauseSyntax { Value.RawKind: NullLiteralExpression }) {
-        }
-
-        return $"{typeStringBuilder} {parameterVariableName}";
-
-        static StringBuilder GetTypeString(ITypeSymbol typeSymbol, StringBuilder? sb = null) {
-            sb ??= new();
-
-            sb.Append("global::");
-            if (!typeSymbol.ContainingNamespace.IsGlobalNamespace) {
-                sb.Append(typeSymbol.ContainingNamespace).Append(".");
-            }
-
-            sb.Append(GetTypeWithHierarchy(typeSymbol));
-
-            if (typeSymbol is INamedTypeSymbol { TypeArguments.Length: > 0 } namedTypeSymbol) {
-                sb.Append("<");
-
-                for (var i = 0; i < namedTypeSymbol.TypeArguments.Length; i++) {
-                    if (i > 0) {
-                        sb.Append(", ");
-                    }
-
-                    sb = GetTypeString(namedTypeSymbol.TypeArguments[i], sb);
-                }
-
-                sb.Append(">");
-            }
-
-            return sb;
-
-            static StringBuilder GetTypeWithHierarchy(ITypeSymbol? typeSymbol, StringBuilder? sb = null) {
-                if (typeSymbol is null) {
-                    return sb ?? new();
-                }
-
-                sb ??= new();
-
-                if (sb.Length > 0) {
-                    sb.Insert(0, ".");
-                }
-
-                sb.Insert(0, typeSymbol.Name);
-
-                return GetTypeWithHierarchy(typeSymbol.ContainingType, sb);
-            }
-        }
+        return new StringBuilder()
+            .AppendType(parameterTypeSymbol, parameterDeclaredSymbol)
+            .Append(" ")
+            .AppendVariableName(parameter)
+            .AppendDefaultValue(parameter, parameterTypeSymbol, parameterDeclaredSymbol)
+            .ToString();
     }
 
     #endregion
+
+    private static string ExtractAttributeName(NameSyntax? name) {
+        return name switch {
+            SimpleNameSyntax ins => ins.Identifier.Text,
+            QualifiedNameSyntax qns => qns.Right.Identifier.Text,
+            _ => ""
+        };
+    }
 }
