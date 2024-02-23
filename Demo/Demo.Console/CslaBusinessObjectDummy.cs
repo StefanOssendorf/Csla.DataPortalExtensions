@@ -58,12 +58,13 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
         return Task.CompletedTask;
     }
 
-    private void Krznbf(global::Csla.IDataPortal<CslaBusinessObjectDummy> tmp) {
+    private async Task Krznbf(global::Csla.IDataPortal<CslaBusinessObjectDummy> tmp) {
         IDataPortal<CslaBusinessObjectDummy>? portal = null;
         IChildDataPortal<CslaBusinessObjectDummy>? childPortal = null;
 
         IDataPortal<global::Demo.Console.CslaBusinessObjectDummy>? dataPortal = null;
 
+        await dataPortal!.FetchAsync();
         //portal.CreateAsync
         //portal.DeleteAsync
         //portal.ExecuteAsync

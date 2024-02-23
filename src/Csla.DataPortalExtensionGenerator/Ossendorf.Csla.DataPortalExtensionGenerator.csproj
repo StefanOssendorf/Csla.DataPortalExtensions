@@ -16,10 +16,6 @@
     <PropertyGroup>
         <PackageId>Ossendorf.Csla.DataPortalExtensionGenerator</PackageId>
         <PackageTags>CSLA.NET IDataPortal IChildDataPortal DataPortalExtensions CSLA</PackageTags>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/StefanOssendorf/Csla.DataPortalExtensions</PackageProjectUrl>
-        <PackageReleaseNotes>https://github.com/StefanOssendorf/Csla.DataPortalExtensions/releases</PackageReleaseNotes>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     
@@ -31,7 +27,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta08" PrivateAssets="all" ExcludeAssets="runtime" />
-        <PackageReference Include="Polyfill" Version="2.3.0">
+        <PackageReference Include="Polyfill" Version="2.6.5">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

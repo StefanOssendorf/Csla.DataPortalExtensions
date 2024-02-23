@@ -12,6 +12,11 @@
         <Company></Company>
         <Authors>Stefan Ossendorf</Authors>
         <Copyright>© $([System.DateTime]::Now.ToString(yyyy)) $(Authors)</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageProjectUrl>https://github.com/StefanOssendorf/Csla.DataPortalExtensions</PackageProjectUrl>
+        <PackageReleaseNotes>https://github.com/StefanOssendorf/Csla.DataPortalExtensions/releases</PackageReleaseNotes>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
