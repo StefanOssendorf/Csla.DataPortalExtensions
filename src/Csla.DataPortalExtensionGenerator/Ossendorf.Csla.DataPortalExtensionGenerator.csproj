@@ -16,6 +16,7 @@
     <PropertyGroup>
         <PackageId>Ossendorf.Csla.DataPortalExtensionGenerator</PackageId>
         <PackageTags>CSLA.NET IDataPortal IChildDataPortal DataPortalExtensions CSLA</PackageTags>
+        <Description>Generates extension methods for CSLA.NET data portal operations.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     

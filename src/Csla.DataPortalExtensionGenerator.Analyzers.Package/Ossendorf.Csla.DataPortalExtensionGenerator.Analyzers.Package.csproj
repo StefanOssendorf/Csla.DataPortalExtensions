@@ -18,6 +18,11 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Csla.DataPortalExtensionGenerator.Analyzers\Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.csproj" />
+
+        <PackageReference Include="MinVer" Version="4.3.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
