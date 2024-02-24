@@ -1,12 +1,13 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Csla;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 
-namespace Csla.DataPortalExtensionGenerator.Analyzers.Test; 
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test; 
 public static partial class CSharpAnalyzerVerifier<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new() {
-    public class Test : CSharpAnalyzerTest<TAnalyzer, MSTestVerifier> {
+    public class Test : CSharpAnalyzerTest<TAnalyzer, XUnitVerifier> {
         public Test() {
             SolutionTransforms.Add((solution, projectId) => {
                 var compilationOptions = solution.GetProject(projectId).CompilationOptions;
