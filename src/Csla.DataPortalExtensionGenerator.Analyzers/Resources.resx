@@ -117,16 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AnalyzerDescription" xml:space="preserve">
-    <value>Type names should be all uppercase.</value>
-    <comment>An optional longer localizable description of the diagnostic.</comment>
+  <data name="DPEG1000Description" xml:space="preserve">
+    <value>The data portal method should not be used. Instead the type and compile safe extension method from the data portal extension generator should be used.</value>
   </data>
-  <data name="AnalyzerMessageFormat" xml:space="preserve">
-    <value>Type name '{0}' contains lowercase letters</value>
-    <comment>The format-able message the diagnostic displays.</comment>
+  <data name="DPEG1000MessageFormat" xml:space="preserve">
+    <value>The data portal method '{0}' should not be used. Use a generated extension method instead.</value>
   </data>
-  <data name="AnalyzerTitle" xml:space="preserve">
-    <value>Type name contains lowercase letters</value>
-    <comment>The title of the diagnostic.</comment>
+  <data name="DPEG1000Title" xml:space="preserve">
+    <value>Csla data portal method is used</value>
   </data>
 </root>
