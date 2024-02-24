@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 
-namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests.Helper;
 
 internal class TestHelper {
 
@@ -73,7 +73,7 @@ namespace GeneratorTests {{
             Verifier.Verify(CreateResultFromRun(driver, expectedFileCount))
                 .UseDirectory("Snapshots")
                 .ScrubLinesContaining(StringComparison.Ordinal, ".GeneratedCode(\"Ossendorf.Csla.Dataportal")
-            //.AutoVerify()
+        //.AutoVerify()
         );
     }
 
@@ -86,10 +86,10 @@ namespace GeneratorTests {{
         };
     }
 
-    public static void Diagnostic(string portalExtensionClass, string expectedDiagnosticId) 
+    public static void Diagnostic(string portalExtensionClass, string expectedDiagnosticId)
         => Diagnostic(portalExtensionClass, "", expectedDiagnosticId);
 
-    public static void Diagnostic(string portalExtensionClass, string cslaClass, string expectedDiagnosticId) 
+    public static void Diagnostic(string portalExtensionClass, string cslaClass, string expectedDiagnosticId)
         => Diagnostic(portalExtensionClass, cslaClass, null, diagnostics => diagnostics.Should().OnlyContain(d => d.Id == expectedDiagnosticId), d => { });
 
     public static void Diagnostic(string validExtensionClass, string cslaClass, string expectedDiagnosticId, TestAnalyzerConfigOptionsProvider globalCompilerOptions)
