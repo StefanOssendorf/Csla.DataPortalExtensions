@@ -10,6 +10,9 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class NotDataPortalExtensionMethodUsedAnalyzer : DiagnosticAnalyzer {
+    /// <summary>
+    /// The diagnostic id.
+    /// </summary>
     public const string DiagnosticId = "DPEG1000";
 
     private static readonly LocalizableString _title = new LocalizableResourceString(nameof(Resources.DPEG1000Title), Resources.ResourceManager, typeof(Resources));
