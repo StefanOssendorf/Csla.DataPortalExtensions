@@ -8,8 +8,6 @@ internal sealed class TestAnalyzerConfigOptionsProvider : AnalyzerConfigOptionsP
 
     public static TestAnalyzerConfigOptionsProvider Empty { get; } = new TestAnalyzerConfigOptionsProvider(TestAnalyzerConfigOptions.Empty);
 
-    private readonly ImmutableDictionary<object, AnalyzerConfigOptions> _treeDict = ImmutableDictionary<object, AnalyzerConfigOptions>.Empty;
-
     public override AnalyzerConfigOptions GlobalOptions { get; }
 
     private TestAnalyzerConfigOptionsProvider(AnalyzerConfigOptions globalOptions) {
@@ -21,8 +19,10 @@ internal sealed class TestAnalyzerConfigOptionsProvider : AnalyzerConfigOptionsP
     public override AnalyzerConfigOptions GetOptions(AdditionalText textFile) 
         => TestAnalyzerConfigOptions.Empty;
 
-    public static TestAnalyzerConfigOptionsProvider Create(string key, string value) => Create(new[] { KeyValuePair.Create(key, value) });
+    public static TestAnalyzerConfigOptionsProvider Create(string key, string value) 
+        => Create(new[] { KeyValuePair.Create(key, value) });
 
-    public static TestAnalyzerConfigOptionsProvider Create(IEnumerable<KeyValuePair<string,string>> config) => new(new TestAnalyzerConfigOptions(ImmutableDictionary.CreateRange(config))
+    public static TestAnalyzerConfigOptionsProvider Create(IEnumerable<KeyValuePair<string,string>> config) 
+        => new(new TestAnalyzerConfigOptions(ImmutableDictionary.CreateRange(config))
 );
 }

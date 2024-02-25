@@ -86,5 +86,32 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers {
                 return ResourceManager.GetString("DPEG1000Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The portal method must inject any IDataPortal or IChildDataPortal paramters instead of accepting it as normal parameter..
+        /// </summary>
+        internal static string DPEG1001Description {
+            get {
+                return ResourceManager.GetString("DPEG1001Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; parameter must be injected. Add the [Inject] attribute to the parameter..
+        /// </summary>
+        internal static string DPEG1001MessageFormat {
+            get {
+                return ResourceManager.GetString("DPEG1001MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I(Child)DataPortal must be injected.
+        /// </summary>
+        internal static string DPEG1001Title {
+            get {
+                return ResourceManager.GetString("DPEG1001Title", resourceCulture);
+            }
+        }
     }
 }

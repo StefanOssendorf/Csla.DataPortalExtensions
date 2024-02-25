@@ -1,5 +1,4 @@
-﻿using Xunit;
-using VerifyCS = Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test.CSharpAnalyzerVerifier<Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.NotDataPortalExtensionMethodUsedAnalyzer>;
+﻿using VerifyCS = Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test.CSharpAnalyzerVerifier<Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.NotDataPortalExtensionMethodUsedAnalyzer>;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test;
 
@@ -10,8 +9,8 @@ public class NotDataPortalExtensionMethodUsedAnalyzerTests {
             return new([
                 "FetchAsync()",
                 "CreateAsync()",
-                @"UpdateAsync(""asds"")",
-                "DeleteAsync()"
+                "DeleteAsync()",
+                "ExecuteAsync()"
             ]);
         }
     }
@@ -46,8 +45,7 @@ namespace TestNamespace {{
         get {
             return new([
                 "FetchChildAsync()",
-                "CreateChildAsync()",
-                @"UpdateChildAsync(""asds"")"
+                "CreateChildAsync()"
             ]);
         }
     }
@@ -75,6 +73,48 @@ namespace TestNamespace {{
         }}
     }}
 }}";
+        await VerifyCS.VerifyAnalyzerAsync(cslaSource);
+    }
+
+    [Fact]
+    public async Task IDataPortalUpdateMustNotGetDiagnosticDPEG1000() {
+        var cslaSource = @$"
+using Csla;
+using System.Threading.Tasks;
+
+namespace TestNamespace {{
+
+    public class Testing {{
+    
+        public async Task Test1() {{
+            IDataPortal<string> fooPortal = null!;
+
+            var x = await fooPortal.UpdateAsync(""asdad"");
+        }}
+    }}
+}}";
+
+        await VerifyCS.VerifyAnalyzerAsync(cslaSource);
+    }
+
+    [Fact]
+    public async Task IChildDataPortalUpdateMustNotGetDiagnosticDPEG1000() {
+        var cslaSource = @$"
+using Csla;
+using System.Threading.Tasks;
+
+namespace TestNamespace {{
+
+    public class Testing {{
+    
+        public async Task Test1() {{
+            IChildDataPortal<string> fooPortal = null!;
+
+            await fooPortal.UpdateChildAsync(""asdad"");
+        }}
+    }}
+}}";
+
         await VerifyCS.VerifyAnalyzerAsync(cslaSource);
     }
 }

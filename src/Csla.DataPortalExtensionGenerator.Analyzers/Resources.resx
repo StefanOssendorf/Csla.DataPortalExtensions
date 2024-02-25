@@ -126,4 +126,13 @@
   <data name="DPEG1000Title" xml:space="preserve">
     <value>Csla data portal method is used</value>
   </data>
+  <data name="DPEG1001Description" xml:space="preserve">
+    <value>The portal method must inject any IDataPortal or IChildDataPortal paramters instead of accepting it as normal parameter.</value>
+  </data>
+  <data name="DPEG1001MessageFormat" xml:space="preserve">
+    <value>The '{0}' parameter must be injected. Add the [Inject] attribute to the parameter.</value>
+  </data>
+  <data name="DPEG1001Title" xml:space="preserve">
+    <value>I(Child)DataPortal must be injected</value>
+  </data>
 </root>
