@@ -1,8 +1,10 @@
 # DataPortal extensions for [CSLA.NET](https://cslanet.com/)
 
 
-_![NuGet Version](https://img.shields.io/nuget/v/Ossendorf.Csla.DataPortalExtensionGenerator)_
+_![NuGet Version Generator](https://img.shields.io/nuget/v/Ossendorf.Csla.DataPortalExtensionGenerator?label=Generator)_
 _![GitHub Release](https://img.shields.io/github/v/release/StefanOssendorf/Csla.DataPortalExtensions?include_prereleases)_  
+_![NuGet Version Analyzer](https://img.shields.io/nuget/v/Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers?label=Analyzer)__
+
 _[![PullRequest Validation](https://github.com/StefanOssendorf/Csla.DataPortalExtensions/actions/workflows/pr-ci.yml/badge.svg?branch=master)](https://github.com/StefanOssendorf/Csla.DataPortalExtensions/actions/workflows/pr-ci.yml)_
 
 

@@ -5,7 +5,7 @@ namespace Ossendorf.Csla.DataPortalExtensionsGenerator.Tests.CsprojConfig;
 public class GeneratorConfigTests {
     [Fact]
     public async Task Test1() {
-        IDataPortal<TestBO> tmp = null;
+        IDataPortal<TestBO>? tmp = null;
 
         if (tmp != null) {
             await tmp.PrefixFetchABCSuffix(1);

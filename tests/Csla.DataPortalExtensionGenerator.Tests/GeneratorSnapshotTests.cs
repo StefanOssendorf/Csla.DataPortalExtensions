@@ -1,3 +1,4 @@
+using Ossendorf.Csla.DataPortalExtensionGenerator.Tests.Helper;
 using System;
 using System.Threading.Tasks;
 using Xunit;
