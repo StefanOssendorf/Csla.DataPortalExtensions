@@ -71,7 +71,7 @@ namespace GeneratorTests {{
 
         return configureVerify(
             Verifier.Verify(CreateResultFromRun(driver, expectedFileCount))
-                .UseDirectory("..\\Snapshots")
+                .UseDirectory("../Snapshots")
                 .ScrubLinesContaining(StringComparison.Ordinal, ".GeneratedCode(\"Ossendorf.Csla.Dataportal")
         //.AutoVerify()
         );
