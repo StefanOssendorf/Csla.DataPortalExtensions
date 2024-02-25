@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalEx
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csla.DataPortalExtensionGenerator.Analyzers.Vsix", "src\Csla.DataPortalExtensionGenerator.Analyzers.Vsix\Csla.DataPortalExtensionGenerator.Analyzers.Vsix.csproj", "{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes", "src\Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes\Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes.csproj", "{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{11ED6E2C-88E6-4A6C-9EFB-E6F1DFE3BD0D} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
 		{1DC38685-54BB-4E42-91B8-875576455CD5} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
 		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
+		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B49097F5-E8D3-4EA2-BCBD-9CCDA3B72E9E}
