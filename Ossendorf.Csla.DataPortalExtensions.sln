@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csla.DataPortalExtensionGen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes", "src\Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes\Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes.csproj", "{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator.Attributes", "src\Csla.DataPortalExtensionGenerator.Attributes\Ossendorf.Csla.DataPortalExtensionGenerator.Attributes.csproj", "{01D5FECB-C502-4399-AD91-4E0476B734A4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01D5FECB-C502-4399-AD91-4E0476B734A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01D5FECB-C502-4399-AD91-4E0476B734A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01D5FECB-C502-4399-AD91-4E0476B734A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01D5FECB-C502-4399-AD91-4E0476B734A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

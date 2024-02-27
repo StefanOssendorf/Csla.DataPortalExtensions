@@ -35,10 +35,16 @@
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Csla.DataPortalExtensionGenerator.Attributes\Ossendorf.Csla.DataPortalExtensionGenerator.Attributes.csproj" PrivateAssets="all" />
+    </ItemGroup>
+
     <!-- This ensures the library will be packaged as a source generator when we use `dotnet pack` -->
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="\" />
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
         <None Include="Ossendorf.Csla.DataPortalExtensionGenerator.props" Pack="true" PackagePath="build" />
+        <None Include="$(OutputPath)\Ossendorf.Csla.DataPortalExtensionGenerator.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="$(OutputPath)\Ossendorf.Csla.DataPortalExtensionGenerator.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
     </ItemGroup>
 </Project>

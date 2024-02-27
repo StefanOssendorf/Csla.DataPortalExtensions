@@ -1,9 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
@@ -14,13 +12,8 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator {
 
     /// <inheritdoc />
-    public void Initialize(IncrementalGeneratorInitializationContext context) {
-        AddMarkerAttribute(context);
-        AddCodeGenerator(context);
-    }
-
-    private static void AddMarkerAttribute(IncrementalGeneratorInitializationContext context)
-        => context.RegisterPostInitializationOutput(ctx => ctx.AddSource("DataPortalExtensionsAttribute.g.cs", SourceText.From(GeneratorHelper.MarkerAttribute, Encoding.UTF8)));
+    public void Initialize(IncrementalGeneratorInitializationContext context) 
+        => AddCodeGenerator(context);
 
     private static void AddCodeGenerator(IncrementalGeneratorInitializationContext context) {
         var optionsAndDiagnostics = GetGeneratorOptions(context);
