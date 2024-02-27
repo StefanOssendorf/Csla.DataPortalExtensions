@@ -23,7 +23,7 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
 
         var extensionClassesAndDiagnostics = context.SyntaxProvider
             .ForAttributeWithMetadataName(
-                fullyQualifiedMetadataName: GeneratorHelper.FullyQalifiedNameOfMarkerAttribute,
+                fullyQualifiedMetadataName: typeof(DataPortalExtensionsAttribute).FullName,
                 predicate: static (node, _) => node is ClassDeclarationSyntax,
                 transform: Parser.GetExtensionClass
             );

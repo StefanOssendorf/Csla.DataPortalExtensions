@@ -4,7 +4,6 @@ using FluentAssertions.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Collections.Immutable;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests.Helper;
 
@@ -19,19 +18,19 @@ namespace GeneratorTests {{
 
     public static Task Verify(string cslaSource) => Verify(cslaSource, true);
 
-    public static Task Verify(string cslaSource, TestAnalyzerConfigOptionsProvider globalCompilerOptions) => Verify(cslaSource, "", t => t, 2, true, globalCompilerOptions);
+    public static Task Verify(string cslaSource, TestAnalyzerConfigOptionsProvider globalCompilerOptions) => Verify(cslaSource, "", t => t, 1, true, globalCompilerOptions);
 
     public static Task Verify(string cslaSource, bool enableNullableContext) => Verify(cslaSource, "", enableNullableContext);
 
     public static Task Verify(string cslaSource, string additionalSource) => Verify(cslaSource, additionalSource, true);
 
-    public static Task Verify(string cslaSource, string additionalSource, bool enableNullableContext) => Verify(cslaSource, additionalSource, 2, enableNullableContext);
+    public static Task Verify(string cslaSource, string additionalSource, bool enableNullableContext) => Verify(cslaSource, additionalSource, 1, enableNullableContext);
 
     public static Task Verify(string cslaSource, string additionalSource, int expectedFileCount) => Verify(cslaSource, additionalSource, expectedFileCount, true);
 
     public static Task Verify(string cslaSource, string additionalSource, int expectedFileCount, bool enableNullableContext) => Verify(cslaSource, additionalSource, s => s, expectedFileCount, enableNullableContext);
 
-    public static Task Verify(string cslaSource, Func<SettingsTask, SettingsTask> configureVerify) => Verify(cslaSource, "", configureVerify, 2, true);
+    public static Task Verify(string cslaSource, Func<SettingsTask, SettingsTask> configureVerify) => Verify(cslaSource, "", configureVerify, 1, true);
 
     public static Task Verify(string cslaSource, string additionalSource, Func<SettingsTask, SettingsTask> configureVerify, int expectedFileCount, bool enableNullableContext, TestAnalyzerConfigOptionsProvider? globalCompilerOptions = null) {
 
@@ -48,7 +47,8 @@ namespace GeneratorTests {{
             .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
             .Select(a => MetadataReference.CreateFromFile(a.Location))
             .Concat(new[] {
-                MetadataReference.CreateFromFile(typeof(FetchAttribute).Assembly.Location)
+                MetadataReference.CreateFromFile(typeof(FetchAttribute).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(DataPortalExtensionsAttribute).Assembly.Location)
             });
 
         var compilation = CSharpCompilation.Create(
