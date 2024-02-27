@@ -17,7 +17,7 @@ _[![PullRequest Validation](https://github.com/StefanOssendorf/Csla.DataPortalEx
 dotnet add package Ossendorf.Csla.DataPortalExtensionsGenerator
 ```
 ```xml
-<PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="0.1.0-preview1" PrivateAssets="all" ExcludeAssets="runtime" />
+<PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="0.4.0-preview1" PrivateAssets="all" ExcludeAssets="runtime" />
 ```
 Either way adds the source generator to your project. Make sure to add `PrivateAssets="all" ExcludeAssets="runtime"` to mark it as a build dependency. Otherwise it flows to projects which depend on your project.
 

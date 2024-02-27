@@ -432,7 +432,7 @@ namespace GeneratorTests2 {{
     }}
 }}";
 
-        return TestHelper.Verify(cslaSource, additionalClassToGenerateInto, 3);
+        return TestHelper.Verify(cslaSource, additionalClassToGenerateInto, 2);
     }
 
     [Fact]
