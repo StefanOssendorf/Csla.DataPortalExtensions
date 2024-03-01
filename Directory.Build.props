@@ -24,6 +24,14 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <DebugType>embedded</DebugType>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <LangVersion>latest</LangVersion>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
         <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
         <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
