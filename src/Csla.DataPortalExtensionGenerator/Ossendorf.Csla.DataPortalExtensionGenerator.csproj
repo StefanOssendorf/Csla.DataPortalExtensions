@@ -7,11 +7,6 @@
         <IsPackable>true</IsPackable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <IncludeBuildOutput>false</IncludeBuildOutput>
-        <DevelopmentDependency>true</DevelopmentDependency>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <NoPackageAnalysis>true</NoPackageAnalysis>
     </PropertyGroup>
     
     <PropertyGroup>
