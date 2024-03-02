@@ -10,6 +10,7 @@ internal static class StringBuilderExtensions {
 
     public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate> foundOperations, in GeneratorOptions options, CancellationToken ct) {
         const string intendation = "        ";
+        const string thisArgumentName = "__dpeg_source";
 
         var groupedByClass = foundOperations.Cast<PortalOperationToGenerate>().GroupBy(o => o.Object).ToImmutableArray();
 
@@ -41,8 +42,8 @@ internal static class StringBuilderExtensions {
                     .Append(visibilityModifier).Append(" static ")
                     .Append("global::System.Threading.Tasks.").Append(returnType).Append(" ").Append(options.MethodPrefix).Append(operation.MethodName).Append(options.MethodSuffix)
                     .Append("(this global::Csla.I").Append(childPrefix).Append("DataPortal<").Append(boName).Append("> ")
-                    .Append("portal").Append(parameters).Append(")")
-                    .Append(" => portal.").Append(operation.PortalMethod.ToStringFast()).Append("Async")
+                    .Append(thisArgumentName).Append(parameters).Append(")")
+                    .Append(" => ").Append(thisArgumentName).Append(".").Append(operation.PortalMethod.ToStringFast()).Append("Async")
                     .Append("(").Append(arguments).Append(");").AppendLine();
             }
         }
