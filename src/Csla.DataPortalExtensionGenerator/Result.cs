@@ -1,4 +1,5 @@
 ﻿using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 

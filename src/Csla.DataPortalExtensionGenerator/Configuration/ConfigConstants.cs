@@ -1,4 +1,4 @@
-﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator;
+﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
 
 internal static class ConfigConstants {
     public const string MethodPrefix = "DataPortalExtensionGen_MethodPrefix";

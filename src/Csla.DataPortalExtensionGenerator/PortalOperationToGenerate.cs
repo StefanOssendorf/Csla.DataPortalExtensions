@@ -1,4 +1,6 @@
-﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator;
+﻿using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
+
+namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 internal readonly record struct PortalOperationToGenerate {
 

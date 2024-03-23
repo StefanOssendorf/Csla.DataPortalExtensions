@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
 using System.Globalization;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;

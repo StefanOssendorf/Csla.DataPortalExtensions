@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Ossendorf.Csla.DataPortalExtensionGenerator;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
 
 internal readonly record struct GeneratorOptions {
     public readonly string MethodPrefix;

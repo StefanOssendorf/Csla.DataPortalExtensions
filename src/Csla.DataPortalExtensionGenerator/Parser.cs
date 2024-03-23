@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection.Metadata;
 using System.Text;
@@ -51,28 +52,29 @@ internal static class Parser {
         return name is not null && GeneratorHelper.RecognizedCslaDataPortalAttributes.Keys.Contains(name);
     }
 
-    public static Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)> GetPortalMethods(GeneratorSyntaxContext ctx, CancellationToken ct) {
-        var attributeSyntax = (AttributeSyntax)ctx.Node;
+    public static Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)> GetPortalMethods(GeneratorAttributeSyntaxContext ctx, DataPortalMethod dataPortalMethod, CancellationToken ct) {
+        //var attributeSyntax = (AttributeSyntax)ctx.Node;
 
-        if (attributeSyntax.Parent?.Parent is not MethodDeclarationSyntax methodDeclaration) {
-            return Result<PortalOperationToGenerate>.NotValid();
-        }
+        //if (attributeSyntax.Parent?.Parent is not MethodDeclarationSyntax methodDeclaration) {
+        //    return Result<PortalOperationToGenerate>.NotValid();
+        //}
 
-        ct.ThrowIfCancellationRequested();
+        //ct.ThrowIfCancellationRequested();
 
-        if (ctx.SemanticModel.GetTypeInfo(attributeSyntax).Type is not { ContainingNamespace.Name: "Csla" } attributeTypeInfo) {
-            return Result<PortalOperationToGenerate>.NotValid();
-        }
+        //if (ctx.SemanticModel.GetTypeInfo(attributeSyntax).Type is not { ContainingNamespace.Name: "Csla" } attributeTypeInfo) {
+        //    return Result<PortalOperationToGenerate>.NotValid();
+        //}
 
-        ct.ThrowIfCancellationRequested();
+        //ct.ThrowIfCancellationRequested();
 
-        if (!GeneratorHelper.RecognizedCslaDataPortalAttributes.TryGetValue(attributeTypeInfo.Name, out var dataPortalMethod)) {
-            return Result<PortalOperationToGenerate>.NotValid();
-        }
+        //if (!GeneratorHelper.RecognizedCslaDataPortalAttributes.TryGetValue(attributeTypeInfo.Name, out var dataPortalMethod)) {
+        //    return Result<PortalOperationToGenerate>.NotValid();
+        //}
 
-        ct.ThrowIfCancellationRequested();
+        //ct.ThrowIfCancellationRequested();
 
-        if (!GetPortalObject(methodDeclaration.Parent, ctx.SemanticModel, ct, out var portalObject)) {
+        var methodDeclaration = (MethodDeclarationSyntax)ctx.TargetNode;
+        if (!GetPortalObject(ctx.TargetNode.Parent, ctx.SemanticModel, ct, out var portalObject)) {
             return Result<PortalOperationToGenerate>.NotValid();
         }
 

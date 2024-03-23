@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Ossendorf.Csla.DataPortalExtensionGenerator;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 
 /// <summary>
 /// Polyfill for .NET 6 HashCode  
@@ -230,7 +230,7 @@ internal struct HashCode {
 
     public void Add<T>(T value) => Add(value?.GetHashCode() ?? 0);
 
-    public void Add<T>(T value, IEqualityComparer<T>? comparer) => Add(value is null ? 0 : (comparer?.GetHashCode(value) ?? value.GetHashCode()));
+    public void Add<T>(T value, IEqualityComparer<T>? comparer) => Add(value is null ? 0 : comparer?.GetHashCode(value) ?? value.GetHashCode());
 
     private void Add(int value) {
         // The original xxHash works as follows:
@@ -345,5 +345,5 @@ internal struct HashCode {
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static uint RotateLeft(uint value, int offset)
-        => (value << offset) | (value >> (32 - offset));
+        => value << offset | value >> 32 - offset;
 }

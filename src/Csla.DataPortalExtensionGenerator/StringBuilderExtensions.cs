@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 using System.Collections.Immutable;
 using System.Text;
 
