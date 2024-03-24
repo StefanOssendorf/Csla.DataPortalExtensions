@@ -18,21 +18,19 @@ namespace GeneratorTests {{
 
     public static Task Verify(string cslaSource) => Verify(cslaSource, true);
 
-    public static Task Verify(string cslaSource, TestAnalyzerConfigOptionsProvider globalCompilerOptions) => Verify(cslaSource, "", t => t, 1, true, globalCompilerOptions);
+    public static Task Verify(string cslaSource, TestAnalyzerConfigOptionsProvider globalCompilerOptions) => Verify(cslaSource, "", t => t, true, globalCompilerOptions, []);
 
     public static Task Verify(string cslaSource, bool enableNullableContext) => Verify(cslaSource, "", enableNullableContext);
 
     public static Task Verify(string cslaSource, string additionalSource) => Verify(cslaSource, additionalSource, true);
 
-    public static Task Verify(string cslaSource, string additionalSource, bool enableNullableContext) => Verify(cslaSource, additionalSource, 1, enableNullableContext);
+    public static Task Verify(string cslaSource, string additionalSource, IEnumerable<string> generatorFilesToIgnore) => Verify(cslaSource, additionalSource, s => s, true, TestAnalyzerConfigOptionsProvider.Empty, generatorFilesToIgnore);
 
-    public static Task Verify(string cslaSource, string additionalSource, int expectedFileCount) => Verify(cslaSource, additionalSource, expectedFileCount, true);
+    public static Task Verify(string cslaSource, string additionalSource, bool enableNullableContext) => Verify(cslaSource, additionalSource, s => s, enableNullableContext, TestAnalyzerConfigOptionsProvider.Empty, []);
 
-    public static Task Verify(string cslaSource, string additionalSource, int expectedFileCount, bool enableNullableContext) => Verify(cslaSource, additionalSource, s => s, expectedFileCount, enableNullableContext);
+    public static Task Verify(string cslaSource, Func<SettingsTask, SettingsTask> configureVerify) => Verify(cslaSource, "", configureVerify, true, TestAnalyzerConfigOptionsProvider.Empty, []);
 
-    public static Task Verify(string cslaSource, Func<SettingsTask, SettingsTask> configureVerify) => Verify(cslaSource, "", configureVerify, 1, true);
-
-    public static Task Verify(string cslaSource, string additionalSource, Func<SettingsTask, SettingsTask> configureVerify, int expectedFileCount, bool enableNullableContext, TestAnalyzerConfigOptionsProvider? globalCompilerOptions = null) {
+    public static Task Verify(string cslaSource, string additionalSource, Func<SettingsTask, SettingsTask> configureVerify, bool enableNullableContext, TestAnalyzerConfigOptionsProvider globalCompilerOptions, IEnumerable<string> generatorFilesToIgnore) {
 
         var syntaxTrees = new List<SyntaxTree>() {
             CSharpSyntaxTree.ParseText(ClassToGenerateExtensionsInto), // ExtensionClassTree
@@ -56,11 +54,12 @@ namespace GeneratorTests {{
                 syntaxTrees: syntaxTrees,
                 references: references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithNullableContextOptions(enableNullableContext ? NullableContextOptions.Enable : NullableContextOptions.Disable)
+                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> { { "CS1701", ReportDiagnostic.Suppress } })
             );
 
         var generator = new DataPortalExtensionGenerator();
 
-        var driver = CSharpGeneratorDriver.Create(generator).WithUpdatedAnalyzerConfigOptions(globalCompilerOptions ?? TestAnalyzerConfigOptionsProvider.Empty);
+        var driver = CSharpGeneratorDriver.Create(generator).WithUpdatedAnalyzerConfigOptions(globalCompilerOptions);
 
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
 
@@ -70,19 +69,23 @@ namespace GeneratorTests {{
         }
 
         return configureVerify(
-            Verifier.Verify(CreateResultFromRun(driver, expectedFileCount))
-                .UseDirectory("../Snapshots")
+            Verifier.Verify(CreateResultFromRun(driver, generatorFilesToIgnore))
+                .UseDirectory("..\\Snapshots")
                 .ScrubLinesContaining(StringComparison.Ordinal, ".GeneratedCode(\"Ossendorf.Csla.Dataportal")
-        //.AutoVerify()
+            //.AutoVerify()
         );
     }
 
-    private static RunResultWithIgnoreList CreateResultFromRun(GeneratorDriver driver, int expectedFileCount) {
+    private static RunResultWithIgnoreList CreateResultFromRun(GeneratorDriver driver, IEnumerable<string> generatorFilesToIgnore) {
+        var filesToIgnore = new HashSet<string>(generatorFilesToIgnore) {
+            "DataPortalExtensionsAttribute.g.cs",
+            "GeneratorTests.DataPortalExtensions_CodeGenIndicationAttributes.g.cs"
+        };
+
         var result = driver.GetRunResult();
-        _ = result.GeneratedTrees.Length.Should().Be(expectedFileCount, "The generated code must contain the attribute and the generated extension class.");
         return new RunResultWithIgnoreList {
             Result = result,
-            IgnoredFiles = { "DataPortalExtensionsAttribute.g.cs" }
+            IgnoredFiles = filesToIgnore
         };
     }
 

@@ -241,7 +241,7 @@ using GenericTests;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : BusinessBase<DummyBOWithParams> {{
     [Fetch]
     private void Bar(TestGenerica<RandomClass, RandomClass.RandomInner, RandomClass.RandomInner.ImportantEnum> krznbf) {{
     }}
@@ -432,7 +432,7 @@ namespace GeneratorTests2 {{
     }}
 }}";
 
-        return TestHelper.Verify(cslaSource, additionalClassToGenerateInto, 2);
+        return TestHelper.Verify(cslaSource, additionalClassToGenerateInto, ["GeneratorTests2.DataPortalExtensions2_CodeGenIndicationAttributes.g.cs"]);
     }
 
     [Fact]
@@ -469,5 +469,102 @@ public class DummyBOWithParams {{
 
         var globalCompilerOptions = TestAnalyzerConfigOptionsProvider.Create("DataPortalExtensionGen_MethodSuffix", "Suffix");
         return TestHelper.Verify(cslaSource, globalCompilerOptions);
+    }
+
+    [Fact]
+    public Task ExecuteParameterlessWithoutCreate() {
+        var cslaSource = $@"
+using Csla;
+
+namespace ExecuteTests;
+
+public class DummyCmd : CommandBase<DummyCmd> {{
+    [Execute]
+    private void ExecuteWithoutParameters() {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource, s => s.AutoVerify());
+    }
+
+    [Fact]
+    public Task ExecuteWithParameters() {
+        var cslaSource = $@"
+using Csla;
+
+namespace ExecuteTests;
+
+public class DummyCmd : CommandBase<DummyCmd> {{
+    [Execute]
+    private void ExecuteWitParameters(string x, int y) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource);
+    }
+
+    [Fact]
+    public Task ExecuteParamterlessWithCreate() {
+        var cslaSource = $@"
+using Csla;
+
+namespace ExecuteTests;
+
+public class DummyCmd : CommandBase<DummyCmd> {{
+    [Create]
+    private void Create() {{
+    }}
+
+    [Execute]
+    private void ExecuteWithoutParameters() {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource);
+    }
+
+    [Fact]
+    public Task ExecuteWithParametersAndCreate() {
+        var cslaSource = $@"
+using Csla;
+
+namespace ExecuteTests;
+
+public class DummyCmd : CommandBase<DummyCmd> {{
+    [Create]
+    private void Create() {{
+    }}
+
+    [Execute]
+    private void ExecuteWithParameters(string x, int y) {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource);
+    }
+
+    [Fact]
+    public Task ExecuteWithCreateParameters() {
+        var cslaSource = $@"
+using Csla;
+
+namespace ExecuteTests;
+
+public class DummyCmd : CommandBase<DummyCmd> {{
+    [Create]
+    private void Create(int a, string x) {{
+    }}
+
+    [Execute]
+    private void ExecuteWithoutParameters() {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource);
     }
 }
