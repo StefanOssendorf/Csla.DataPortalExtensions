@@ -29,6 +29,22 @@ internal static class Emitter {
         context.AddSource(fileName, code);
     }
 
+    public static void EmitClassForCreateAndExecute(SourceProductionContext context, (((ClassForExtensions Class, ImmutableArray<PortalOperationToGenerate> Creates) ClassAndCreates, ImmutableArray<PortalOperationToGenerate> Executes) CslaObjectData, GeneratorOptions Options) data) {
+        if (data.CslaObjectData.Executes.IsDefaultOrEmpty && data.CslaObjectData.ClassAndCreates.Creates.IsDefaultOrEmpty) {
+            return;
+        }
+
+        context.CancellationToken.ThrowIfCancellationRequested();
+
+        EmitClassForAttribute(context, (data.CslaObjectData.ClassAndCreates, data.Options));
+        EmitClassForAttribute(context, ((data.CslaObjectData.ClassAndCreates.Class, data.CslaObjectData.Executes), data.Options));
+        EmitClassForExecuteCommand(context, data.CslaObjectData.ClassAndCreates.Class, data.CslaObjectData.ClassAndCreates.Creates, data.CslaObjectData.Executes, data.Options);
+    }
+
+    private static void EmitClassForExecuteCommand(SourceProductionContext context, ClassForExtensions @class, ImmutableArray<PortalOperationToGenerate> creates, ImmutableArray<PortalOperationToGenerate> executes, GeneratorOptions options) {
+        throw new NotImplementedException();
+    }
+
     public static void EmitClassForAttribute(SourceProductionContext context, ((ClassForExtensions Class, ImmutableArray<PortalOperationToGenerate> Methods) ClassesAndMethods, GeneratorOptions Options) data) {
         var methods = data.ClassesAndMethods.Methods;
         if (methods.IsDefaultOrEmpty) {

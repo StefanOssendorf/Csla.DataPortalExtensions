@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection.Metadata;
 using System.Text;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
@@ -41,42 +40,13 @@ internal static class Parser {
 
     #region Csla methods
 
-    public static bool CouldBeCslaDataPortalAttribute(SyntaxNode node, CancellationToken _) {
-
-        if (node is not AttributeSyntax attribute) {
-            return false;
-        }
-
-        var name = ExtractAttributeName(attribute.Name);
-
-        return name is not null && GeneratorHelper.RecognizedCslaDataPortalAttributes.Keys.Contains(name);
-    }
-
     public static Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)> GetPortalMethods(GeneratorAttributeSyntaxContext ctx, DataPortalMethod dataPortalMethod, CancellationToken ct) {
-        //var attributeSyntax = (AttributeSyntax)ctx.Node;
-
-        //if (attributeSyntax.Parent?.Parent is not MethodDeclarationSyntax methodDeclaration) {
-        //    return Result<PortalOperationToGenerate>.NotValid();
-        //}
-
-        //ct.ThrowIfCancellationRequested();
-
-        //if (ctx.SemanticModel.GetTypeInfo(attributeSyntax).Type is not { ContainingNamespace.Name: "Csla" } attributeTypeInfo) {
-        //    return Result<PortalOperationToGenerate>.NotValid();
-        //}
-
-        //ct.ThrowIfCancellationRequested();
-
-        //if (!GeneratorHelper.RecognizedCslaDataPortalAttributes.TryGetValue(attributeTypeInfo.Name, out var dataPortalMethod)) {
-        //    return Result<PortalOperationToGenerate>.NotValid();
-        //}
-
-        //ct.ThrowIfCancellationRequested();
 
         var methodDeclaration = (MethodDeclarationSyntax)ctx.TargetNode;
         if (!GetPortalObject(ctx.TargetNode.Parent, ctx.SemanticModel, ct, out var portalObject)) {
             return Result<PortalOperationToGenerate>.NotValid();
         }
+        ct.ThrowIfCancellationRequested();
 
         var diagnostics = new List<DiagnosticInfo>();
         var parameters = GetRelevantParametersForMethod(methodDeclaration, ctx.SemanticModel, ct, dataPortalMethod, diagnostics);
@@ -132,6 +102,7 @@ internal static class Parser {
             foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), parametersFormattedForUsage, hasPublicModifier));
         }
 
+        ct.ThrowIfCancellationRequested();
         return new EquatableArray<OperationParameter>([.. foundParameters]);
 
         static bool IsInjectedParameter(ParameterSyntax parameter) {

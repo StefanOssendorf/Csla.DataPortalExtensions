@@ -20,22 +20,7 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void AddCodeGenerator(IncrementalGeneratorInitializationContext context) {
         var options = OptionsGeneratorPart.GetGeneratorOptions(context);
-
-        var extensionClassesAndDiagnostics = context.SyntaxProvider
-            .ForAttributeWithMetadataName(
-                fullyQualifiedMetadataName: typeof(DataPortalExtensionsAttribute).FullName,
-                predicate: static (node, _) => node is ClassDeclarationSyntax,
-                transform: Parser.GetExtensionClass
-            );
-
-        context.RegisterSourceOutput(
-            extensionClassesAndDiagnostics.SelectMany((r, _) => r.Errors),
-            static (ctx, info) => ctx.ReportDiagnostic(info)
-        );
-
-        var extensionClassDeclaration = extensionClassesAndDiagnostics
-            .Select((r, _) => r.Value);
-
+        var extensionClassDeclaration = ExtensionClassGeneratorPart.GetExtensionClasses(context);
         var fetches = GetFetches(context);
         var fetchChilds= GetFetchChilds(context);
         var creates = GetCreates(context);
@@ -46,10 +31,10 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
         RegisterCodeGenAttributesSources(context, extensionClassDeclaration);
         RegisterAttributeSourceOutput(context, extensionClassDeclaration, fetches , options);
         RegisterAttributeSourceOutput(context, extensionClassDeclaration, fetchChilds , options);
-        RegisterAttributeSourceOutput(context, extensionClassDeclaration, creates , options);
         RegisterAttributeSourceOutput(context, extensionClassDeclaration, createChilds , options);
         RegisterAttributeSourceOutput(context, extensionClassDeclaration, deletes , options);
-        RegisterAttributeSourceOutput(context, extensionClassDeclaration, executes , options);
+
+        RegisterCreateAndExecuteSourceOupt(context, extensionClassDeclaration, creates, executes, options);
 
         static void RegisterAttributeSourceOutput(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> methods, IncrementalValueProvider<GeneratorOptions> options) {
             var combined = classes.Combine(methods.Collect()).Combine(options);
@@ -59,8 +44,21 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
                 Emitter.EmitClassForAttribute
             );
         }
+
+        static void RegisterCreateAndExecuteSourceOupt(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> creates, IncrementalValuesProvider<PortalOperationToGenerate> executes, IncrementalValueProvider<GeneratorOptions> options) {
+            var combined = classes
+                .Combine(creates.Collect())
+                .Combine(executes.Collect())
+                .Combine(options);
+
+            ctx.RegisterSourceOutput(
+                combined,
+                Emitter.EmitClassForCreateAndExecute
+            );
+        }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void RegisterCodeGenAttributesSources(IncrementalGeneratorInitializationContext context, IncrementalValuesProvider<ClassForExtensions> extensionClassDeclaration) {
         context.RegisterSourceOutput(
             extensionClassDeclaration,
@@ -94,7 +92,7 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetOperationsToGenerateByCslaAttribute(IncrementalGeneratorInitializationContext context, string qualifiedCslaAttribute, DataPortalMethod dataPortalMethod) {
-        var fetchesAndDiagnostics = context.SyntaxProvider
+        var operationsAndDiagnostics = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: qualifiedCslaAttribute,
                 predicate: IsMethodDeclarationSyntax,
@@ -102,11 +100,11 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
             );
 
         context.RegisterSourceOutput(
-            fetchesAndDiagnostics.SelectMany((r, _) => r.Errors),
+            operationsAndDiagnostics.SelectMany((r, _) => r.Errors),
             static (ctx, info) => ctx.ReportDiagnostic(info)
         );
 
-        return fetchesAndDiagnostics
+        return operationsAndDiagnostics
             .Where(r => r.Value.IsValid)
             .Select((r, _) => r.Value.PortalOperationToGenerate);
     }
