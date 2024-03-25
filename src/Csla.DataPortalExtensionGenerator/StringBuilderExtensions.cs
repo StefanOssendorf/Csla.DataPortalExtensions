@@ -3,17 +3,19 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 using System.Collections.Immutable;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 internal static class StringBuilderExtensions {
+    private const string Intendation = "        ";
+    private const string ThisArgumentName = "__dpeg_source";
+
     private static SymbolDisplayFormat FullyQualifiedFormat { get; } = SymbolDisplayFormat.FullyQualifiedFormat.WithMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier | SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
 
     public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate> foundOperations, in GeneratorOptions options, CancellationToken ct) {
-        const string intendation = "        ";
-        const string thisArgumentName = "__dpeg_source";
-
+        
         var groupedByClass = foundOperations.Cast<PortalOperationToGenerate>().GroupBy(o => o.Object).ToImmutableArray();
 
         foreach (var operationsByClass in groupedByClass) {
@@ -38,14 +40,14 @@ internal static class StringBuilderExtensions {
 
                 var (parameters, arguments) = GetParametersAndArgumentsToUse(operation.Parameters, ct);
 
-                var visibilityModifier = operationsByClass.Key.HasPublicModifier && operation.Parameters.All(p => p.IsPublic) ? "public" : "internal";
+                var visibilityModifier = GetVisibilityModifier(operationsByClass.Key, operation);
 
-                _ = sb.Append(intendation)
+                _ = sb.Append(Intendation)
                     .Append(visibilityModifier).Append(" static ")
                     .Append("global::System.Threading.Tasks.").Append(returnType).Append(" ").Append(options.MethodPrefix).Append(operation.MethodName).Append(options.MethodSuffix)
                     .Append("(this global::Csla.I").Append(childPrefix).Append("DataPortal<").Append(boName).Append("> ")
-                    .Append(thisArgumentName).Append(parameters).Append(")")
-                    .Append(" => ").Append(thisArgumentName).Append(".").Append(operation.PortalMethod.ToStringFast()).Append("Async")
+                    .Append(ThisArgumentName).Append(parameters).Append(")")
+                    .Append(" => ").Append(ThisArgumentName).Append(".").Append(operation.PortalMethod.ToStringFast()).Append("Async")
                     .Append("(").Append(arguments).Append(");").AppendLine();
             }
         }
@@ -60,6 +62,9 @@ internal static class StringBuilderExtensions {
             };
         }
     }
+
+    private static string GetVisibilityModifier(PortalObject operationsByClass, PortalOperationToGenerate operation) 
+        => operationsByClass.HasPublicModifier && operation.Parameters.All(p => p.IsPublic) ? "public" : "internal";
 
     private static (StringBuilder Parameters, StringBuilder Arguments) GetParametersAndArgumentsToUse(EquatableArray<OperationParameter> parameters, CancellationToken ct) {
         var parametersBuilder = new StringBuilder();
@@ -131,4 +136,49 @@ internal static class StringBuilderExtensions {
         //const int NullLiteralExpression = 8754; // See https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp.syntaxkind?view=roslyn-dotnet-4.7.0#microsoft-codeanalysis-csharp-syntaxkind-nullliteralexpression
         //if (parameter.Default is EqualsValueClauseSyntax { Value.RawKind: NullLiteralExpression }) {
     }
+
+    public static StringBuilder AddClassContent(this StringBuilder sb, Func<StringBuilder, StringBuilder> addClassContent) => addClassContent(sb);
+
+    public static StringBuilder AppendCreateAndExecuteMethods(this StringBuilder sb, ImmutableArray<PortalOperationToGenerate> executes, ImmutableArray<PortalOperationToGenerate> creates, GeneratorOptions options, CancellationToken ct) {
+        var groupedCreates = creates.GroupBy(c => c.Object).ToImmutableDictionary(k => k.Key, v => v.ToImmutableArray());
+        var groupedExecutes = executes.GroupBy(e => e.Object).ToImmutableDictionary(k => k.Key, v => v.ToImmutableArray());
+
+        foreach (var executesOfClass in groupedExecutes) {
+            ct.ThrowIfCancellationRequested();
+            if (!groupedCreates.TryGetValue(executesOfClass.Key, out var createsOfClass)) {
+                continue;
+            }
+            
+            var boName = executesOfClass.Key.GloballyQualifiedName;
+
+            foreach (var executeOfClass in executesOfClass.Value) {
+                ct.ThrowIfCancellationRequested();
+                foreach (var createOfClass in createsOfClass) {
+                    ct.ThrowIfCancellationRequested();
+                    var visibilityModifier = GetVisibilityModifier(executesOfClass.Key, createOfClass);
+
+                    _ = sb.Append(Intendation)
+                        .Append(visibilityModifier).Append(" static ")
+                        .Append("global::System.Threading.Tasks.Task<").Append(boName).Append("> ").Append(options.MethodPrefix).Append(executeOfClass.MethodName).Append(options.MethodSuffix)
+                        .Append("(this global::Csla.IDataPortal<").Append(boName).Append("> ")
+                        .Append(ThisArgumentName).Append(", ").Append(boName).Append(" cmd)")
+                        .Append(" => ").Append(ThisArgumentName).Append(".").Append(DataPortalMethod.Execute.ToStringFast()).Append("Async(cmd);").AppendLine();
+                }
+            }
+        }
+        ct.ThrowIfCancellationRequested();
+
+        return sb;
+    }
+
+//    private static void DoKrznbf() {
+//        var x = @"public static async Task<CommandObject> ExecuteCommand(this IDataPortal<CommandObject> portal, params) {
+//    var cmd = await portal.TypedCreateHere(params);
+//    return await portal.TypedExecute(cmd));
+//}
+
+//public static async Task<CommandObject> TypedExecute(this IDataPortal<CommandObject> portal, CommandObject cmd)
+//    => await portal.ExecuteAsync(cmd);
+//";
+//    }
 }
