@@ -514,7 +514,7 @@ namespace ExecuteTests;
 
 public class DummyCmd : CommandBase<DummyCmd> {{
     [Create]
-    private void Create() {{
+    private void CreateAs() {{
     }}
 
     [Execute]
@@ -556,8 +556,34 @@ namespace ExecuteTests;
 
 public class DummyCmd : CommandBase<DummyCmd> {{
     [Create]
-    private void Create(int a, string x) {{
+    private void CreateTest(int a, string x) {{
     }}
+
+    [Execute]
+    private void ExecuteWithoutParameters() {{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource);
+    }
+
+    [Fact]
+    public Task ExecuteAndMultipleCreates() {
+        var cslaSource = $@"
+using Csla;
+
+namespace ExecuteTests;
+
+public class DummyCmd : CommandBase<DummyCmd> {{
+    [Create]
+    private void CreateTest(int a, string x) {{
+    }}
+
+    [Create]
+    private void CreateTest(string x, int a) {{
+    }}
+
 
     [Execute]
     private void ExecuteWithoutParameters() {{

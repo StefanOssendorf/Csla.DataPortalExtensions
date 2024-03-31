@@ -3,19 +3,19 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 using System.Collections.Immutable;
-using System.Reflection.Metadata;
 using System.Text;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
 internal static class StringBuilderExtensions {
-    private const string Intendation = "        ";
-    private const string ThisArgumentName = "__dpeg_source";
+    private const string Intendation = "    ";
+    private const string TwoIntendations = $"{Intendation}{Intendation}";
+    private const string ThisDataPortalArgumentName = "__dpeg_source";
 
     private static SymbolDisplayFormat FullyQualifiedFormat { get; } = SymbolDisplayFormat.FullyQualifiedFormat.WithMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier | SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
 
     public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate> foundOperations, in GeneratorOptions options, CancellationToken ct) {
-        
+
         var groupedByClass = foundOperations.Cast<PortalOperationToGenerate>().GroupBy(o => o.Object).ToImmutableArray();
 
         foreach (var operationsByClass in groupedByClass) {
@@ -42,12 +42,12 @@ internal static class StringBuilderExtensions {
 
                 var visibilityModifier = GetVisibilityModifier(operationsByClass.Key, operation);
 
-                _ = sb.Append(Intendation)
+                _ = sb.Append(TwoIntendations)
                     .Append(visibilityModifier).Append(" static ")
                     .Append("global::System.Threading.Tasks.").Append(returnType).Append(" ").Append(options.MethodPrefix).Append(operation.MethodName).Append(options.MethodSuffix)
                     .Append("(this global::Csla.I").Append(childPrefix).Append("DataPortal<").Append(boName).Append("> ")
-                    .Append(ThisArgumentName).Append(parameters).Append(")")
-                    .Append(" => ").Append(ThisArgumentName).Append(".").Append(operation.PortalMethod.ToStringFast()).Append("Async")
+                    .Append(ThisDataPortalArgumentName).Append(parameters).Append(")")
+                    .Append(" => ").Append(ThisDataPortalArgumentName).Append(".").Append(operation.PortalMethod.ToStringFast()).Append("Async")
                     .Append("(").Append(arguments).Append(");").AppendLine();
             }
         }
@@ -63,7 +63,7 @@ internal static class StringBuilderExtensions {
         }
     }
 
-    private static string GetVisibilityModifier(PortalObject operationsByClass, PortalOperationToGenerate operation) 
+    private static string GetVisibilityModifier(PortalObject operationsByClass, PortalOperationToGenerate operation)
         => operationsByClass.HasPublicModifier && operation.Parameters.All(p => p.IsPublic) ? "public" : "internal";
 
     private static (StringBuilder Parameters, StringBuilder Arguments) GetParametersAndArgumentsToUse(EquatableArray<OperationParameter> parameters, CancellationToken ct) {
@@ -117,7 +117,7 @@ internal static class StringBuilderExtensions {
         return sb;
     }
 
-    public static StringBuilder AppendVariableName(this StringBuilder sb, ParameterSyntax parameter) 
+    public static StringBuilder AppendVariableName(this StringBuilder sb, ParameterSyntax parameter)
         => sb.Append(parameter.Identifier.ToString());
 
     public static StringBuilder AppendDefaultValue(this StringBuilder sb, ParameterSyntax parameter, ITypeSymbol parameterTypeSymbol, IParameterSymbol parameterDeclaredSymbol) {
@@ -132,9 +132,6 @@ internal static class StringBuilderExtensions {
         }
 
         return sb;
-
-        //const int NullLiteralExpression = 8754; // See https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp.syntaxkind?view=roslyn-dotnet-4.7.0#microsoft-codeanalysis-csharp-syntaxkind-nullliteralexpression
-        //if (parameter.Default is EqualsValueClauseSyntax { Value.RawKind: NullLiteralExpression }) {
     }
 
     public static StringBuilder AddClassContent(this StringBuilder sb, Func<StringBuilder, StringBuilder> addClassContent) => addClassContent(sb);
@@ -143,42 +140,64 @@ internal static class StringBuilderExtensions {
         var groupedCreates = creates.GroupBy(c => c.Object).ToImmutableDictionary(k => k.Key, v => v.ToImmutableArray());
         var groupedExecutes = executes.GroupBy(e => e.Object).ToImmutableDictionary(k => k.Key, v => v.ToImmutableArray());
 
+        const string thisCommandArgumentName = "__dpeg_command";
+        const string localVariableCommandName = "__dpeg_tmp_cmd";
         foreach (var executesOfClass in groupedExecutes) {
             ct.ThrowIfCancellationRequested();
             if (!groupedCreates.TryGetValue(executesOfClass.Key, out var createsOfClass)) {
                 continue;
             }
-            
+
             var boName = executesOfClass.Key.GloballyQualifiedName;
 
-            foreach (var executeOfClass in executesOfClass.Value) {
+            for (var i = 0; i < executesOfClass.Value.Length; i++) {
+                var executeOfClass = executesOfClass.Value[i];
+
+                if (i == 0) {
+                    var visibilityModifier = GetVisibilityModifier(executesOfClass.Key, default);
+
+                    _ = sb.Append(TwoIntendations)
+                            .Append(visibilityModifier).Append(" static ")
+                            .Append("global::System.Threading.Tasks.Task<").Append(boName).Append("> ").AppendMethodName(executeOfClass, options)
+                            .Append("(this global::Csla.IDataPortal<").Append(boName).Append("> ")
+                            .Append(ThisDataPortalArgumentName).Append(", ").Append(boName).Append(" ").Append(thisCommandArgumentName).Append(")")
+                            .Append(" => ").Append(ThisDataPortalArgumentName).Append(".").Append(DataPortalMethod.Execute.ToStringFast()).Append("Async(").Append(thisCommandArgumentName).Append(");")
+                            .AppendLine();
+                }
+
                 ct.ThrowIfCancellationRequested();
                 foreach (var createOfClass in createsOfClass) {
                     ct.ThrowIfCancellationRequested();
-                    var visibilityModifier = GetVisibilityModifier(executesOfClass.Key, createOfClass);
 
-                    _ = sb.Append(Intendation)
-                        .Append(visibilityModifier).Append(" static ")
-                        .Append("global::System.Threading.Tasks.Task<").Append(boName).Append("> ").Append(options.MethodPrefix).Append(executeOfClass.MethodName).Append(options.MethodSuffix)
-                        .Append("(this global::Csla.IDataPortal<").Append(boName).Append("> ")
-                        .Append(ThisArgumentName).Append(", ").Append(boName).Append(" cmd)")
-                        .Append(" => ").Append(ThisArgumentName).Append(".").Append(DataPortalMethod.Execute.ToStringFast()).Append("Async(cmd);").AppendLine();
+                    if (executeOfClass.Parameters.Count != 0) {
+                        continue;
+                    }
+
+                    var visibilityModifier = GetVisibilityModifier(executesOfClass.Key, createOfClass);
+                    var (createParameters, createArguments) = GetParametersAndArgumentsToUse(createOfClass.Parameters, ct);
+                    
+                    _ = sb.Append(TwoIntendations)
+                        .Append(visibilityModifier).Append(" static async ")
+                        .Append("global::System.Threading.Tasks.Task<").Append(boName).Append("> ").AppendMethodName("CreateAndExecuteCommand", options)
+                        .Append("(this global::Csla.IDataPortal<").Append(boName).Append("> ").Append(ThisDataPortalArgumentName).Append(createParameters).AppendLine(") {")
+                        .Append(TwoIntendations).Append(Intendation).Append("var ").Append(localVariableCommandName).Append(" = await ").Append(ThisDataPortalArgumentName).Append(".").AppendMethodName(createOfClass, options).Append("(")
+                        .Append(createArguments).AppendLine(");")
+                        .Append(TwoIntendations).Append(Intendation).Append("return await ").Append(ThisDataPortalArgumentName).Append(".").AppendMethodName(executeOfClass, options)
+                        .Append("(").Append(localVariableCommandName).AppendLine(");")
+                        .Append(TwoIntendations).AppendLine("}");
                 }
             }
         }
+
         ct.ThrowIfCancellationRequested();
 
         return sb;
     }
 
-//    private static void DoKrznbf() {
-//        var x = @"public static async Task<CommandObject> ExecuteCommand(this IDataPortal<CommandObject> portal, params) {
-//    var cmd = await portal.TypedCreateHere(params);
-//    return await portal.TypedExecute(cmd));
-//}
+    private static StringBuilder AppendMethodName(this StringBuilder sb, PortalOperationToGenerate portalOperationToGenerate, GeneratorOptions options)
+        => sb.AppendMethodName(portalOperationToGenerate.MethodName, options);
 
-//public static async Task<CommandObject> TypedExecute(this IDataPortal<CommandObject> portal, CommandObject cmd)
-//    => await portal.ExecuteAsync(cmd);
-//";
-//    }
+    private static StringBuilder AppendMethodName(this StringBuilder sb, string methodName, GeneratorOptions options)
+        => sb.Append(options.MethodPrefix).Append(methodName).Append(options.MethodSuffix);
+
 }
