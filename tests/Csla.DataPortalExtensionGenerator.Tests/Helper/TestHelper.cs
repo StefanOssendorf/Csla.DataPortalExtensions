@@ -68,9 +68,10 @@ namespace GeneratorTests {{
             diagnostics.Should().BeEmpty();
         }
 
+        var relativeSnapshotPath = Path.Combine("..", "Snapshots");
         return configureVerify(
             Verifier.Verify(CreateResultFromRun(driver, generatorFilesToIgnore))
-                .UseDirectory("..\\Snapshots")
+                .UseDirectory(relativeSnapshotPath)
                 .ScrubLinesContaining(StringComparison.Ordinal, ".GeneratedCode(\"Ossendorf.Csla.Dataportal")
             //.AutoVerify()
         );
