@@ -1,7 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
@@ -12,89 +14,101 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator {
 
     /// <inheritdoc />
-    public void Initialize(IncrementalGeneratorInitializationContext context) 
+    public void Initialize(IncrementalGeneratorInitializationContext context)
         => AddCodeGenerator(context);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void AddCodeGenerator(IncrementalGeneratorInitializationContext context) {
-        var optionsAndDiagnostics = GetGeneratorOptions(context);
+        var options = OptionsGeneratorPart.GetGeneratorOptions(context);
+        var extensionClassDeclaration = ExtensionClassGeneratorPart.GetExtensionClasses(context);
+        var fetches = GetFetches(context);
+        var fetchChilds= GetFetchChilds(context);
+        var creates = GetCreates(context);
+        var createChilds = GetCreateChilds(context);
+        var deletes = GetDeletes(context);
+        var executes = GetExecutes(context);
 
-        var options = optionsAndDiagnostics
-            .Select((o, _) => o.Value);
+        RegisterCodeGenAttributesSources(context, extensionClassDeclaration);
+        RegisterAttributeSourceOutput(context, extensionClassDeclaration, fetches , options);
+        RegisterAttributeSourceOutput(context, extensionClassDeclaration, fetchChilds , options);
+        RegisterAttributeSourceOutput(context, extensionClassDeclaration, createChilds , options);
+        RegisterAttributeSourceOutput(context, extensionClassDeclaration, deletes , options);
 
-        var extensionClassesAndDiagnostics = context.SyntaxProvider
+        RegisterCreateAndExecuteSourceOupt(context, extensionClassDeclaration, creates, executes, options);
+
+        static void RegisterAttributeSourceOutput(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> methods, IncrementalValueProvider<GeneratorOptions> options) {
+            var combined = classes.Combine(methods.Collect()).Combine(options);
+
+            ctx.RegisterSourceOutput(
+                combined,
+                Emitter.EmitClassForAttribute
+            );
+        }
+
+        static void RegisterCreateAndExecuteSourceOupt(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> creates, IncrementalValuesProvider<PortalOperationToGenerate> executes, IncrementalValueProvider<GeneratorOptions> options) {
+            var combined = classes
+                .Combine(creates.Collect())
+                .Combine(executes.Collect())
+                .Combine(options);
+
+            ctx.RegisterSourceOutput(
+                combined,
+                Emitter.EmitClassForCreateAndExecute
+            );
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void RegisterCodeGenAttributesSources(IncrementalGeneratorInitializationContext context, IncrementalValuesProvider<ClassForExtensions> extensionClassDeclaration) {
+        context.RegisterSourceOutput(
+            extensionClassDeclaration,
+            Emitter.EmitClassWithSourceGenIndicationAttributes
+        );
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetFetches(IncrementalGeneratorInitializationContext context) 
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Fetch, DataPortalMethod.Fetch);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetFetchChilds(IncrementalGeneratorInitializationContext context)
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.FetchChild, DataPortalMethod.FetchChild);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetCreates(IncrementalGeneratorInitializationContext context)
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Create, DataPortalMethod.Create);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetCreateChilds(IncrementalGeneratorInitializationContext context)
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.CreateChild, DataPortalMethod.CreateChild);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetDeletes(IncrementalGeneratorInitializationContext context)
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Delete, DataPortalMethod.Delete);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetExecutes(IncrementalGeneratorInitializationContext context)
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Execute, DataPortalMethod.Execute);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetOperationsToGenerateByCslaAttribute(IncrementalGeneratorInitializationContext context, string qualifiedCslaAttribute, DataPortalMethod dataPortalMethod) {
+        var operationsAndDiagnostics = context.SyntaxProvider
             .ForAttributeWithMetadataName(
-                fullyQualifiedMetadataName: typeof(DataPortalExtensionsAttribute).FullName,
-                predicate: static (node, _) => node is ClassDeclarationSyntax,
-                transform: Parser.GetExtensionClass
+                fullyQualifiedMetadataName: qualifiedCslaAttribute,
+                predicate: IsMethodDeclarationSyntax,
+                transform: (ctx, ct) => Parser.GetPortalMethods(ctx, dataPortalMethod, ct)
             );
 
-        var extensionClassDeclaration = extensionClassesAndDiagnostics
-            .Select((r, _) => r.Value);
-
-        var methodDeclarationsAndDiagnostics = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: Parser.CouldBeCslaDataPortalAttribute,
-                transform: Parser.GetPortalMethods
-            );
-
-        var methodDeclarations = methodDeclarationsAndDiagnostics
-            .Where(static m => m.Value.IsValid)
-            .Select((m, _) => m.Value.PortalOperationToGenerate)
-            .Collect();
-
-        var classesToGenerateInto = extensionClassDeclaration.Combine(methodDeclarations).Combine(options);
-
         context.RegisterSourceOutput(
-            extensionClassesAndDiagnostics.SelectMany((r, _) => r.Errors),
-            static (ctx, info) => ctx.ReportDiagnostic(info)
-        );
-        context.RegisterSourceOutput(
-            methodDeclarationsAndDiagnostics.SelectMany((m, _) => m.Errors),
-            static (ctx, info) => ctx.ReportDiagnostic(info)
-        );
-        context.RegisterSourceOutput(
-            optionsAndDiagnostics.SelectMany((o, _) => o.Errors),
+            operationsAndDiagnostics.SelectMany((r, _) => r.Errors),
             static (ctx, info) => ctx.ReportDiagnostic(info)
         );
 
-        context.RegisterSourceOutput(
-            source: classesToGenerateInto,
-            action: Emitter.EmitExtensionClass
-        );
+        return operationsAndDiagnostics
+            .Where(r => r.Value.IsValid)
+            .Select((r, _) => r.Value.PortalOperationToGenerate);
     }
 
-    private static IncrementalValueProvider<Result<GeneratorOptions>> GetGeneratorOptions(IncrementalGeneratorInitializationContext context) {
-        return context.AnalyzerConfigOptionsProvider.Select((options, _) => {
-
-            if (!TryGetGlobalOption(ConfigConstants.MethodPrefix, out var methodPrefix) || methodPrefix is null) {
-                methodPrefix = "";
-            }
-
-            if (!TryGetGlobalOption(ConfigConstants.MethodSuffix, out var methodSuffix) || methodSuffix is null) {
-                methodSuffix = "";
-            }
-
-            var errors = new List<DiagnosticInfo>();
-            var nullableContextOptions = NullableContextOptions.Enable;
-            if (TryGetGlobalOption(ConfigConstants.NullableContext, out var nullabilityContext)) {
-                if (nullabilityContext.Equals("Disable", StringComparison.OrdinalIgnoreCase)) {
-                    nullableContextOptions = NullableContextOptions.Disable;
-                } else if (!nullabilityContext.Equals("Enable", StringComparison.OrdinalIgnoreCase)) {
-                    errors.Add(NullableContextValueDiagnostic.Create(nullabilityContext));
-                }
-            }
-
-            var suppressWarningCS8669 = false;
-            if (TryGetGlobalOption(ConfigConstants.SuppressWarningCS8669, out var suppressWarningString)) {
-                if (!bool.TryParse(suppressWarningString, out suppressWarningCS8669)) {
-                    suppressWarningCS8669 = false;
-                    errors.Add(SuppressWarningCS8669ValueDiagnostic.Create(suppressWarningString));
-                }
-            }
-
-            return new Result<GeneratorOptions>(new GeneratorOptions(methodPrefix, methodSuffix, nullableContextOptions, suppressWarningCS8669), new EquatableArray<DiagnosticInfo>([.. errors]));
-
-            bool TryGetGlobalOption(string key, [NotNullWhen(true)] out string? value) => options.GlobalOptions.TryGetValue($"build_property.{key}", out value) && !string.IsNullOrWhiteSpace(value);
-        });
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsMethodDeclarationSyntax(SyntaxNode node, CancellationToken _) => node is MethodDeclarationSyntax;
 }
