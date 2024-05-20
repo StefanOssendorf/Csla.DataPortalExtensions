@@ -8,25 +8,25 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <IncludeBuildOutput>false</IncludeBuildOutput>
     </PropertyGroup>
-    
+
     <PropertyGroup>
         <PackageId>Ossendorf.Csla.DataPortalExtensionGenerator</PackageId>
         <PackageTags>CSLA.NET IDataPortal IChildDataPortal DataPortalExtensions CSLA</PackageTags>
         <Description>Generates extension methods for CSLA.NET data portal operations.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
-        <PackageReference Include="MinVer" Version="4.3.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+        <PackageReference Include="MinVer">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta08" PrivateAssets="all" ExcludeAssets="runtime" />
-        <PackageReference Include="Polyfill" Version="2.6.5">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="NetEscapades.EnumGenerators" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Include="Polyfill">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
