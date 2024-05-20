@@ -7,20 +7,20 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        
+
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Csla" Version="7.0.3" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-        <PackageReference Include="xunit" Version="2.7.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
+        <PackageReference Include="Csla" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="6.0.1">
+        <PackageReference Include="coverlet.collector">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -32,7 +32,7 @@
     </PropertyGroup>
 
     <Import Project="../../src/Csla.DataPortalExtensionGenerator/Ossendorf.Csla.DataPortalExtensionGenerator.props" />
-    
+
     <ItemGroup>
         <ProjectReference Include="..\..\src\Csla.DataPortalExtensionGenerator\Ossendorf.Csla.DataPortalExtensionGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
         <ProjectReference Include="..\..\src\Csla.DataPortalExtensionGenerator.Attributes\Ossendorf.Csla.DataPortalExtensionGenerator.Attributes.csproj" ReferenceOutputAssembly="true" OutputItemType="Analyzer" />
