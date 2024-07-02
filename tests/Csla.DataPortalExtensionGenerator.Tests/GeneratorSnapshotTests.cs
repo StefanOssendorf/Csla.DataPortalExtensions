@@ -593,4 +593,27 @@ public class DummyCmd : CommandBase<DummyCmd> {{
 
         return TestHelper.Verify(cslaSource);
     }
+
+    [Fact]
+    public Task CreateOfBaseClassShouldBeAddedToADerivedClassExtensionMethods() {
+        var cslaSource = $@"
+using Csla;
+
+namespace BaseClassTests;
+
+public abstract class FooBase : BusinessBase<FooBase> {{
+    [Create]
+    private void CreateOfBaseClass(int xyz) {{
+    }}
+}}
+
+public class Foo : FooBase {{
+    [Create]
+    private void CreateOfFoo(){{
+    }}
+}}
+";
+
+        return TestHelper.Verify(cslaSource);
+    }
 }

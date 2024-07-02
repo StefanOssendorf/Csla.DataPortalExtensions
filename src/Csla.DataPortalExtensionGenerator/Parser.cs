@@ -13,14 +13,8 @@ internal static class Parser {
     public static Result<ClassForExtensions> GetExtensionClass(GeneratorAttributeSyntaxContext ctx, CancellationToken ct) {
         _ = ct;
 
-        var hasPartialModifier = false;
         var classSyntax = (ClassDeclarationSyntax)ctx.TargetNode;
-        for (var i = 0; i < classSyntax.Modifiers.Count; i++) {
-            if (classSyntax.Modifiers[i].IsKind(SyntaxKind.PartialKeyword)) {
-                hasPartialModifier = true;
-                break;
-            }
-        }
+        var hasPartialModifier = classSyntax.HasModifier(SyntaxKind.PartialKeyword);
 
         EquatableArray<DiagnosticInfo> errors;
         if (!hasPartialModifier) {
@@ -46,6 +40,7 @@ internal static class Parser {
         if (!GetPortalObject(ctx.TargetNode.Parent, ctx.SemanticModel, ct, out var portalObject)) {
             return Result<PortalOperationToGenerate>.NotValid();
         }
+
         ct.ThrowIfCancellationRequested();
 
         var diagnostics = new List<DiagnosticInfo>();
@@ -68,8 +63,14 @@ internal static class Parser {
             return false;
         }
 
+        var baseType = classSymbol.BaseType?.ToString() ?? "";
+        if (!string.IsNullOrWhiteSpace(baseType)) {
+            baseType = $"global::{baseType}";
+        }
+
+        var isAbstract = classDeclaration.HasModifier(SyntaxKind.AbstractKeyword);
         var objectHasPublicModifier = classDeclaration.Modifiers.Any(x => x.ToString().Equals("public", StringComparison.OrdinalIgnoreCase));
-        portalObject = new PortalObject(objectHasPublicModifier, $"global::{classSymbol}");
+        portalObject = new PortalObject(objectHasPublicModifier, $"global::{classSymbol}", baseType, isAbstract);
         return true;
     }
 

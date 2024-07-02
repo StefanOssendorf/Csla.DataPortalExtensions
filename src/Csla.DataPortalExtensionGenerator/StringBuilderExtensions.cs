@@ -21,13 +21,18 @@ internal static class StringBuilderExtensions {
         foreach (var operationsByClass in groupedByClass) {
             ct.ThrowIfCancellationRequested();
 
-            if (!operationsByClass.Any()) {
+            if (operationsByClass.Key.IsAbstract) {
+                continue;
+            }
+
+            var effectiveOperationsOfClass = GetOperationsOfClass(operationsByClass, groupedByClass);
+            if (effectiveOperationsOfClass.IsDefaultOrEmpty) {
                 continue;
             }
 
             var boName = operationsByClass.Key.GloballyQualifiedName;
 
-            foreach (var operation in operationsByClass) {
+            foreach (var operation in effectiveOperationsOfClass) {
                 ct.ThrowIfCancellationRequested();
 
                 var childPrefix = IsChildMethod(operation.PortalMethod) ? "Child" : "";
@@ -60,6 +65,33 @@ internal static class StringBuilderExtensions {
                 DataPortalMethod.Fetch or DataPortalMethod.Delete or DataPortalMethod.Create or DataPortalMethod.Execute => false,
                 _ => throw new InvalidOperationException($"Unknown dataportal method {portalMethod}"),
             };
+        }
+    }
+
+    private static ImmutableArray<PortalOperationToGenerate> GetOperationsOfClass(IGrouping<PortalObject, PortalOperationToGenerate> operationsByClass, ImmutableArray<IGrouping<PortalObject, PortalOperationToGenerate>> groupedByClass) {
+        return
+        [
+            .. operationsByClass,
+            .. GetOperationsOfBaseClass(operationsByClass.Key, operationsByClass.Key.BaseClass, groupedByClass),
+        ];
+
+        static IEnumerable<PortalOperationToGenerate> GetOperationsOfBaseClass(PortalObject actualClass, string baseClassName, ImmutableArray<IGrouping<PortalObject, PortalOperationToGenerate>> knownClasses) {
+            if (string.IsNullOrWhiteSpace(baseClassName)) {
+                yield break;
+            }
+
+            var methodsOfBaseClass = knownClasses.FirstOrDefault(x => x.Key.GloballyQualifiedName == baseClassName);
+            if (methodsOfBaseClass is null) {
+                yield break;
+            }
+
+            foreach (var item in methodsOfBaseClass) {
+                yield return new PortalOperationToGenerate(actualClass, item);
+            }
+
+            foreach (var item in GetOperationsOfBaseClass(actualClass, methodsOfBaseClass.Key.BaseClass, knownClasses)) {
+                yield return item;
+            }
         }
     }
 

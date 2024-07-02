@@ -34,7 +34,7 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
         RegisterAttributeSourceOutput(context, extensionClassDeclaration, createChilds , options);
         RegisterAttributeSourceOutput(context, extensionClassDeclaration, deletes , options);
 
-        RegisterCreateAndExecuteSourceOupt(context, extensionClassDeclaration, creates, executes, options);
+        RegisterCreateAndExecuteSourceOutput(context, extensionClassDeclaration, creates, executes, options);
 
         static void RegisterAttributeSourceOutput(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> methods, IncrementalValueProvider<GeneratorOptions> options) {
             var combined = classes.Combine(methods.Collect()).Combine(options);
@@ -45,7 +45,7 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
             );
         }
 
-        static void RegisterCreateAndExecuteSourceOupt(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> creates, IncrementalValuesProvider<PortalOperationToGenerate> executes, IncrementalValueProvider<GeneratorOptions> options) {
+        static void RegisterCreateAndExecuteSourceOutput(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> creates, IncrementalValuesProvider<PortalOperationToGenerate> executes, IncrementalValueProvider<GeneratorOptions> options) {
             var combined = classes
                 .Combine(creates.Collect())
                 .Combine(executes.Collect())
