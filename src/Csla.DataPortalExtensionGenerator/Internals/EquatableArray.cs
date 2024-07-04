@@ -29,7 +29,7 @@ internal readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnu
     public bool Equals(EquatableArray<T> array) => AsSpan().SequenceEqual(array.AsSpan());
 
     /// <sinheritdoc/>
-    public override bool Equals(object? obj) => obj is EquatableArray<T> array && Equals(this, array);
+    public override bool Equals(object? obj) => obj is EquatableArray<T> array && Equals(array);
 
     /// <sinheritdoc/>
     public override int GetHashCode() {

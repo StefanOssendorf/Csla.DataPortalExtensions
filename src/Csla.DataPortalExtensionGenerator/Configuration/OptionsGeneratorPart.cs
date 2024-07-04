@@ -40,13 +40,13 @@ internal static class OptionsGeneratorPart {
             return new Result<GeneratorOptions>(new GeneratorOptions(methodPrefix, methodSuffix, nullableContextOptions, suppressWarningCS8669), new EquatableArray<DiagnosticInfo>([.. errors]));
 
             bool TryGetGlobalOption(string key, [NotNullWhen(true)] out string? value) => options.GlobalOptions.TryGetValue($"build_property.{key}", out value) && !string.IsNullOrWhiteSpace(value);
-        });
+        }).WithTrackingName(TrackingNames.ExtractOptions);
 
         context.RegisterSourceOutput(
             optionsAndDiagnostics.SelectMany((r, _) => r.Errors),
             static (ctx, info) => ctx.ReportDiagnostic(info)
         );
 
-        return optionsAndDiagnostics.Select((r, _) => r.Value);
+        return optionsAndDiagnostics.Select((r, _) => r.Value).WithTrackingName(TrackingNames.SelectOptions);
     }
 }

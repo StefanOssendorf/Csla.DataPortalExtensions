@@ -2,8 +2,8 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 
@@ -68,36 +68,37 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetFetches(IncrementalGeneratorInitializationContext context) 
-        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Fetch, DataPortalMethod.Fetch);
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Fetch, DataPortalMethod.Fetch, TrackingNames.ExtractFetches, TrackingNames.SelectFetches);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetFetchChilds(IncrementalGeneratorInitializationContext context)
-        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.FetchChild, DataPortalMethod.FetchChild);
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.FetchChild, DataPortalMethod.FetchChild, TrackingNames.ExtractFetchChilds, TrackingNames.SelectFetchChilds);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetCreates(IncrementalGeneratorInitializationContext context)
-        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Create, DataPortalMethod.Create);
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Create, DataPortalMethod.Create,TrackingNames.ExtractCreates, TrackingNames.SelectCreates);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetCreateChilds(IncrementalGeneratorInitializationContext context)
-        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.CreateChild, DataPortalMethod.CreateChild);
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.CreateChild, DataPortalMethod.CreateChild, TrackingNames.ExtractCreateChilds, TrackingNames.SelectCreateChilds);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetDeletes(IncrementalGeneratorInitializationContext context)
-        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Delete, DataPortalMethod.Delete);
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Delete, DataPortalMethod.Delete, TrackingNames.ExtractDeletes, TrackingNames.SelectDeletes);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetExecutes(IncrementalGeneratorInitializationContext context)
-        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Execute, DataPortalMethod.Execute);
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Execute, DataPortalMethod.Execute, TrackingNames.ExtractExecutes, TrackingNames.SelectExecutes);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static IncrementalValuesProvider<PortalOperationToGenerate> GetOperationsToGenerateByCslaAttribute(IncrementalGeneratorInitializationContext context, string qualifiedCslaAttribute, DataPortalMethod dataPortalMethod) {
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetOperationsToGenerateByCslaAttribute(IncrementalGeneratorInitializationContext context, string qualifiedCslaAttribute, DataPortalMethod dataPortalMethod, string extractionTrackingName, string selectTrackingName) {
         var operationsAndDiagnostics = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: qualifiedCslaAttribute,
                 predicate: IsMethodDeclarationSyntax,
                 transform: (ctx, ct) => Parser.GetPortalMethods(ctx, dataPortalMethod, ct)
-            );
+            )
+            .WithTrackingName(extractionTrackingName);
 
         context.RegisterSourceOutput(
             operationsAndDiagnostics.SelectMany((r, _) => r.Errors),
@@ -106,7 +107,8 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
 
         return operationsAndDiagnostics
             .Where(r => r.Value.IsValid)
-            .Select((r, _) => r.Value.PortalOperationToGenerate);
+            .Select((r, _) => r.Value.PortalOperationToGenerate)
+            .WithTrackingName(selectTrackingName);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

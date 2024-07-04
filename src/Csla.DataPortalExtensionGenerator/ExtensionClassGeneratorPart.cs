@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
+using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 using System.Runtime.CompilerServices;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
@@ -13,13 +14,16 @@ internal class ExtensionClassGeneratorPart {
                 fullyQualifiedMetadataName: typeof(DataPortalExtensionsAttribute).FullName,
                 predicate: static (node, _) => node is ClassDeclarationSyntax,
                 transform: Parser.GetExtensionClass
-            );
+            )
+            .WithTrackingName(TrackingNames.ExtractExtensionClasses);
 
         context.RegisterSourceOutput(
             extensionClassesAndDiagnostics.SelectMany((r, _) => r.Errors),
             static (ctx, info) => ctx.ReportDiagnostic(info)
         );
 
-        return extensionClassesAndDiagnostics.Select((r, _) => r.Value);
+        return extensionClassesAndDiagnostics
+            .Select((r, _) => r.Value)
+            .WithTrackingName(TrackingNames.SelectExtensionClasses);
     }
 }
