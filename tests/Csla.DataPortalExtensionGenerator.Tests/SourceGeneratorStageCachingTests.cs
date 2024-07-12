@@ -16,8 +16,16 @@ public class DummyBOWithParams {
     private void AFetch() {
     }
 
+    [FetchChild]
+    private void AFetchChild() {
+    }
+
     [Create]
     private void ACreate() {
+    }
+
+    [CreateChild]
+    private void ACreateChild() {
     }
 
     [Delete]
