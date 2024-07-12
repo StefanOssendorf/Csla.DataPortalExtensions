@@ -64,6 +64,8 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
     }
 
     private async Task Krznbf(global::Csla.IDataPortal<CslaBusinessObjectDummy> tmp) {
+        _ = tmp;
+
         CslaBusinessObjectDummy? dummy = null;
 
         IDataPortal<CslaBusinessObjectDummy>? portal = null;
