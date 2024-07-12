@@ -1,7 +1,4 @@
 using Ossendorf.Csla.DataPortalExtensionGenerator.Tests.Helper;
-using System;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
 
@@ -41,7 +38,7 @@ public class DummyBO {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, cfg => cfg.UseParameters(portalMethod));
+        return SourceGenTester.Verify(cslaSource, cfg => cfg.UseParameters(portalMethod));
     }
 
     [Theory]
@@ -59,7 +56,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
+        return SourceGenTester.Verify(cslaSource, t => t.UseParameters(type));
     }
 
     [Fact]
@@ -77,7 +74,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -94,7 +91,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -111,7 +108,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -128,7 +125,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -156,7 +153,7 @@ public class Foo {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, additionalType);
+        return SourceGenTester.Verify(cslaSource, additionalType);
     }
 
     [Fact]
@@ -175,7 +172,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Theory]
@@ -193,7 +190,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
+        return SourceGenTester.Verify(cslaSource, t => t.UseParameters(type));
     }
 
     [Theory]
@@ -211,7 +208,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, t => t.UseParameters(type));
+        return SourceGenTester.Verify(cslaSource, t => t.UseParameters(type));
     }
 
     [Fact]
@@ -230,7 +227,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -266,7 +263,7 @@ public class RandomClass {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, additionalTypes);
+        return SourceGenTester.Verify(cslaSource, additionalTypes);
     }
 
     [Fact]
@@ -293,7 +290,7 @@ public enum SomeEnum {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, someEnumSource);
+        return SourceGenTester.Verify(cslaSource, someEnumSource);
     }
 
     [Fact]
@@ -320,7 +317,7 @@ public enum SomeEnum {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, someEnumSource);
+        return SourceGenTester.Verify(cslaSource, someEnumSource);
     }
 
     [Fact]
@@ -346,7 +343,7 @@ namespace TestInternal;
 internal record SomeInternalType(string Name, Guid Id);
 ";
 
-        return TestHelper.Verify(cslaSource, someInternalType);
+        return SourceGenTester.Verify(cslaSource, someInternalType);
     }
 
     [Fact]
@@ -364,7 +361,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -381,7 +378,7 @@ public class DummyBOWithParams {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, true);
+        return SourceGenTester.Verify(cslaSource, true);
     }
 
     [Fact]
@@ -408,7 +405,7 @@ public enum SomeEnum {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, someEnumSource);
+        return SourceGenTester.Verify(cslaSource, someEnumSource);
     }
 
     [Fact]
@@ -432,7 +429,7 @@ namespace GeneratorTests2 {{
     }}
 }}";
 
-        return TestHelper.Verify(cslaSource, additionalClassToGenerateInto, ["GeneratorTests2.DataPortalExtensions2_CodeGenIndicationAttributes.g.cs"]);
+        return SourceGenTester.Verify(cslaSource, additionalClassToGenerateInto, ["GeneratorTests2.DataPortalExtensions2_CodeGenIndicationAttributes.g.cs"]);
     }
 
     [Fact]
@@ -450,7 +447,7 @@ public class DummyBOWithParams {{
 ";
 
         var globalCompilerOptions = TestAnalyzerConfigOptionsProvider.Create("DataPortalExtensionGen_MethodPrefix", "Prefix");
-        return TestHelper.Verify(cslaSource, globalCompilerOptions);
+        return SourceGenTester.Verify(cslaSource, globalCompilerOptions);
     }
 
     [Fact]
@@ -468,7 +465,7 @@ public class DummyBOWithParams {{
 ";
 
         var globalCompilerOptions = TestAnalyzerConfigOptionsProvider.Create("DataPortalExtensionGen_MethodSuffix", "Suffix");
-        return TestHelper.Verify(cslaSource, globalCompilerOptions);
+        return SourceGenTester.Verify(cslaSource, globalCompilerOptions);
     }
 
     [Fact]
@@ -485,7 +482,7 @@ public class DummyCmd : CommandBase<DummyCmd> {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource, s => s.AutoVerify());
+        return SourceGenTester.Verify(cslaSource, s => s.AutoVerify());
     }
 
     [Fact]
@@ -502,7 +499,7 @@ public class DummyCmd : CommandBase<DummyCmd> {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -523,7 +520,7 @@ public class DummyCmd : CommandBase<DummyCmd> {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -544,7 +541,7 @@ public class DummyCmd : CommandBase<DummyCmd> {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -565,7 +562,7 @@ public class DummyCmd : CommandBase<DummyCmd> {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 
     [Fact]
@@ -591,6 +588,6 @@ public class DummyCmd : CommandBase<DummyCmd> {{
 }}
 ";
 
-        return TestHelper.Verify(cslaSource);
+        return SourceGenTester.Verify(cslaSource);
     }
 }

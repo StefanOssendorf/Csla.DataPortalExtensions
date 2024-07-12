@@ -46,6 +46,7 @@ internal static class Parser {
         if (!GetPortalObject(ctx.TargetNode.Parent, ctx.SemanticModel, ct, out var portalObject)) {
             return Result<PortalOperationToGenerate>.NotValid();
         }
+
         ct.ThrowIfCancellationRequested();
 
         var diagnostics = new List<DiagnosticInfo>();

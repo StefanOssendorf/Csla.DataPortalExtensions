@@ -21,7 +21,7 @@ namespace GeneratorTests {{
     }}
 }}";
 
-        TestHelper.Diagnostic(extensionClass, expectedDiagnosticId: "DPEGEN001");
+        DiagnosticsTester.Verify(extensionClass, expectedDiagnosticId: "DPEGEN001");
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class Foo {{
 }}
 ";
 
-        TestHelper.Diagnostic(ValidExtensionClass, cslaClass, "DPEGEN002");
+        DiagnosticsTester.Verify(ValidExtensionClass, cslaClass, "DPEGEN002");
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class Foo {{
             KeyValuePair.Create("DataPortalExtensionGen_NullableContext", "disable")
         });
 
-        TestHelper.Diagnostic(ValidExtensionClass, cslaClass, globalCompilerOptions, diagnostics => diagnostics.Should().BeEmpty(), d => d.Should().BeEmpty(), NullableContextOptions.Disable);
+        DiagnosticsTester.Verify(ValidExtensionClass, cslaClass, globalCompilerOptions, diagnostics => diagnostics.Should().BeEmpty(), d => d.Should().BeEmpty(), NullableContextOptions.Disable);
     }
 
     [Fact]
@@ -78,8 +78,8 @@ public class Foo {{
         var globalCompilerOptions = TestAnalyzerConfigOptionsProvider.Create(new[] {
             KeyValuePair.Create("DataPortalExtensionGen_NullableContext", "Unknown")
         });
-        
-        TestHelper.Diagnostic(ValidExtensionClass, cslaClass, "DPEGEN003", globalCompilerOptions);
+
+        DiagnosticsTester.Verify(ValidExtensionClass, cslaClass, "DPEGEN003", globalCompilerOptions);
     }
 
     [Fact]
@@ -98,6 +98,6 @@ public class Foo {{
             KeyValuePair.Create("DataPortalExtensionGen_SuppressWarningCS8669", "NotBooleanParseable")
         });
 
-        TestHelper.Diagnostic(ValidExtensionClass, cslaClass, "DPEGEN004", globalCompilerOptions);
+        DiagnosticsTester.Verify(ValidExtensionClass, cslaClass, "DPEGEN004", globalCompilerOptions);
     }
 }
