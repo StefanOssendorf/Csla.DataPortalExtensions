@@ -2,6 +2,9 @@
 
 namespace Demo.Console;
 
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+#pragma warning disable IDE0051 // Remove unused private members
 [Serializable]
 internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
 
@@ -45,6 +48,7 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
         using (BypassPropertyChecks) {
             Id = 1337;
         }
+
         return Task.CompletedTask;
     }
 
@@ -59,6 +63,7 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
     }
 
     [Delete]
+
     private void Delete() {
         _ = this;
     }
@@ -67,10 +72,8 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
         _ = tmp;
 
         CslaBusinessObjectDummy? dummy = null;
-
         IDataPortal<CslaBusinessObjectDummy>? portal = null;
         IChildDataPortal<CslaBusinessObjectDummy>? childPortal = null;
-
         IDataPortal<global::Demo.Console.CslaBusinessObjectDummy>? dataPortal = null;
         
         await dataPortal!.FetchAsync();
@@ -91,3 +94,6 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
 
     }
 }
+#pragma warning restore IDE0051 // Remove unused private members
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
+#pragma warning restore CS0219 // Variable is assigned but its value is never used

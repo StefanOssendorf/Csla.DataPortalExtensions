@@ -19,6 +19,7 @@ public class GeneratorConfigTests {
 public class TestBO : BusinessBase<TestBO> {
     [Fetch]
     private Task FetchABC(int a) {
+        _ = this;
         _ = a;
         return Task.CompletedTask;
     }
