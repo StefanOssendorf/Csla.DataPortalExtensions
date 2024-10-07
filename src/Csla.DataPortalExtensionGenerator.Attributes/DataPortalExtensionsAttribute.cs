@@ -9,5 +9,4 @@ namespace Ossendorf.Csla.DataPortalExtensionGenerator;
 /// </summary>
 [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 [global::System.Diagnostics.Conditional("DATAPORTAL_EXTENSIONS_USAGES")]
-public sealed class DataPortalExtensionsAttribute : Attribute {
-}
+public sealed class DataPortalExtensionsAttribute : Attribute;

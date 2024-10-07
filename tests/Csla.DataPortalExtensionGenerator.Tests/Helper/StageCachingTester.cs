@@ -73,8 +73,8 @@ internal static class StageCachingTester {
             var runStep2 = runSteps2[i];
 
             // The outputs should be equal between different runs
-            IEnumerable<object> outputs1 = runStep1.Outputs.Select(x => x.Value);
-            IEnumerable<object> outputs2 = runStep2.Outputs.Select(x => x.Value);
+            var outputs1 = runStep1.Outputs.Select(x => x.Value);
+            var outputs2 = runStep2.Outputs.Select(x => x.Value);
 
             outputs1.Should()
                     .Equal(outputs2, $"because {stepName} should produce cacheable outputs");
@@ -102,7 +102,7 @@ internal static class StageCachingTester {
             Visit(obj);
         }
 
-        void Visit(object node) {
+        void Visit(object? node) {
             // If we've already seen this object, or it's null, stop.
             if (node is null || !visited.Add(node)) {
                 return;
@@ -115,14 +115,14 @@ internal static class StageCachingTester {
                 .And.NotBeOfType<SyntaxNode>(because);
 
             // Examine the object
-            Type type = node.GetType();
+            var type = node.GetType();
             if (type.IsPrimitive || type.IsEnum || type == typeof(string)) {
                 return;
             }
 
             // If the object is a collection, check each of the values
             if (node is IEnumerable collection and not string) {
-                foreach (object element in collection) {
+                foreach (var element in collection) {
                     // recursively check each element in the collection
                     Visit(element);
                 }
@@ -131,8 +131,8 @@ internal static class StageCachingTester {
             }
 
             // Recursively check each field in the object
-            foreach (FieldInfo field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-                object fieldValue = field.GetValue(node);
+            foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+                var fieldValue = field.GetValue(node);
                 Visit(fieldValue);
             }
         }
