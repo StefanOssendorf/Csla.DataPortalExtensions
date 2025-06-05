@@ -59,6 +59,24 @@ public class DummyBOWithParams {{
         return SourceGenTester.Verify(cslaSource, t => t.UseParameters(type));
     }
 
+    [Theory]
+    [MemberData(nameof(CSharpBuiltInTypes))]
+    public Task BuiltInTypes(string type) {
+        var cslaSource = $@"
+using Csla;
+
+namespace VerifyTests;
+
+public class DummyBOWithParams {{
+    [Fetch]
+    private void Bar({type} krznbf) {{
+    }}
+}}
+";
+
+        return SourceGenTester.Verify(cslaSource, t => t.UseParameters(type));
+    }
+
     [Fact]
     public Task MultiplePrimitiveParameters() {
         var cslaSource = $@"
