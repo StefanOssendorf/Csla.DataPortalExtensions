@@ -15,7 +15,9 @@ internal readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnu
     /// <summary>
     /// The underlying <typeparamref name="T"/> array.
     /// </summary>
-    private readonly T[]? _array;
+    private readonly T[] _array;
+
+    public T this[int i] => _array[i];
 
     /// <summary>
     /// Creates a new <see cref="EquatableArray{T}"/> instance.
