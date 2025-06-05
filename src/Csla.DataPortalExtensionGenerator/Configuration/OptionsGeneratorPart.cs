@@ -37,7 +37,19 @@ internal static class OptionsGeneratorPart {
                 }
             }
 
-            return new Result<GeneratorOptions>(new GeneratorOptions(methodPrefix, methodSuffix, nullableContextOptions, suppressWarningCS8669), new EquatableArray<DiagnosticInfo>([.. errors]));
+            var tfms = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (TryGetGlobalOption(ConfigConstants.TargetFramework, out var targetFramework) && !string.IsNullOrWhiteSpace(targetFramework)) {
+                tfms.Add(targetFramework);
+            }
+
+            if (TryGetGlobalOption(ConfigConstants.TargetFrameworks, out var targetFrameworks) && !string.IsNullOrWhiteSpace(targetFrameworks)) {
+                var splitTfms = targetFrameworks.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                for (var i = 0; i < splitTfms.Length; i++) {
+                    tfms.Add(splitTfms[i]);
+                }
+            }
+
+            return new Result<GeneratorOptions>(new GeneratorOptions(methodPrefix, methodSuffix, nullableContextOptions, suppressWarningCS8669, new EquatableArray<string>([.. tfms])), new EquatableArray<DiagnosticInfo>([.. errors]));
 
             bool TryGetGlobalOption(string key, [NotNullWhen(true)] out string? value) => options.GlobalOptions.TryGetValue($"build_property.{key}", out value) && !string.IsNullOrWhiteSpace(value);
         }).WithTrackingName(TrackingNames.ExtractOptions);

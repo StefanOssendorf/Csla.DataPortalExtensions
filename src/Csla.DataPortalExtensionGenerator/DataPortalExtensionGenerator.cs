@@ -22,19 +22,19 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
         var options = OptionsGeneratorPart.GetGeneratorOptions(context);
         var extensionClassDeclaration = ExtensionClassGeneratorPart.GetExtensionClasses(context);
         var fetches = GetFetches(context);
-        var fetchChilds= GetFetchChilds(context);
+        var fetchChilds = GetFetchChilds(context);
         var creates = GetCreates(context);
         var createChilds = GetCreateChilds(context);
         var deletes = GetDeletes(context);
         var executes = GetExecutes(context);
 
-        RegisterCodeGenAttributesSources(context, extensionClassDeclaration);
-        RegisterAttributeSourceOutput(context, extensionClassDeclaration, fetches , options);
-        RegisterAttributeSourceOutput(context, extensionClassDeclaration, fetchChilds , options);
-        RegisterAttributeSourceOutput(context, extensionClassDeclaration, createChilds , options);
-        RegisterAttributeSourceOutput(context, extensionClassDeclaration, deletes , options);
+        RegisterCodeGenAttributesSources(context, extensionClassDeclaration, options);
+        RegisterAttributeSourceOutput(context, extensionClassDeclaration, fetches, options);
+        RegisterAttributeSourceOutput(context, extensionClassDeclaration, fetchChilds, options);
+        RegisterAttributeSourceOutput(context, extensionClassDeclaration, createChilds, options);
+        RegisterAttributeSourceOutput(context, extensionClassDeclaration, deletes, options);
 
-        RegisterCreateAndExecuteSourceOupt(context, extensionClassDeclaration, creates, executes, options);
+        RegisterCreateAndExecuteSourceOutput(context, extensionClassDeclaration, creates, executes, options);
 
         static void RegisterAttributeSourceOutput(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> methods, IncrementalValueProvider<GeneratorOptions> options) {
             var combined = classes.Combine(methods.Collect()).Combine(options);
@@ -45,7 +45,7 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
             );
         }
 
-        static void RegisterCreateAndExecuteSourceOupt(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> creates, IncrementalValuesProvider<PortalOperationToGenerate> executes, IncrementalValueProvider<GeneratorOptions> options) {
+        static void RegisterCreateAndExecuteSourceOutput(IncrementalGeneratorInitializationContext ctx, IncrementalValuesProvider<ClassForExtensions> classes, IncrementalValuesProvider<PortalOperationToGenerate> creates, IncrementalValuesProvider<PortalOperationToGenerate> executes, IncrementalValueProvider<GeneratorOptions> options) {
             var combined = classes
                 .Combine(creates.Collect())
                 .Combine(executes.Collect())
@@ -59,33 +59,35 @@ public sealed partial class DataPortalExtensionGenerator : IIncrementalGenerator
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void RegisterCodeGenAttributesSources(IncrementalGeneratorInitializationContext context, IncrementalValuesProvider<ClassForExtensions> extensionClassDeclaration) {
+    private static void RegisterCodeGenAttributesSources(IncrementalGeneratorInitializationContext context, IncrementalValuesProvider<ClassForExtensions> extensionClassDeclaration, IncrementalValueProvider<GeneratorOptions> options) {
+        var combined = extensionClassDeclaration.Combine(options);
+
         context.RegisterSourceOutput(
-            extensionClassDeclaration,
+            combined,
             Emitter.EmitClassWithSourceGenIndicationAttributes
         );
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static IncrementalValuesProvider<PortalOperationToGenerate> GetFetches(IncrementalGeneratorInitializationContext context) 
+    private static IncrementalValuesProvider<PortalOperationToGenerate> GetFetches(IncrementalGeneratorInitializationContext context)
         => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Fetch, DataPortalMethod.Fetch, TrackingNames.ExtractFetches, TrackingNames.SelectFetches);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetFetchChilds(IncrementalGeneratorInitializationContext context)
         => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.FetchChild, DataPortalMethod.FetchChild, TrackingNames.ExtractFetchChilds, TrackingNames.SelectFetchChilds);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetCreates(IncrementalGeneratorInitializationContext context)
-        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Create, DataPortalMethod.Create,TrackingNames.ExtractCreates, TrackingNames.SelectCreates);
-    
+        => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Create, DataPortalMethod.Create, TrackingNames.ExtractCreates, TrackingNames.SelectCreates);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetCreateChilds(IncrementalGeneratorInitializationContext context)
         => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.CreateChild, DataPortalMethod.CreateChild, TrackingNames.ExtractCreateChilds, TrackingNames.SelectCreateChilds);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetDeletes(IncrementalGeneratorInitializationContext context)
         => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Delete, DataPortalMethod.Delete, TrackingNames.ExtractDeletes, TrackingNames.SelectDeletes);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IncrementalValuesProvider<PortalOperationToGenerate> GetExecutes(IncrementalGeneratorInitializationContext context)
         => GetOperationsToGenerateByCslaAttribute(context, QualifiedCslaAttributes.Execute, DataPortalMethod.Execute, TrackingNames.ExtractExecutes, TrackingNames.SelectExecutes);
