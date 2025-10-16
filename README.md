@@ -17,7 +17,7 @@ _[![PullRequest Validation](https://github.com/StefanOssendorf/Csla.DataPortalEx
 dotnet add package Ossendorf.Csla.DataPortalExtensionsGenerator
 ```
 ```xml
-<PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="0.4.0-preview1" PrivateAssets="all" ExcludeAssets="runtime" />
+<PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="1.0.1" PrivateAssets="all" ExcludeAssets="runtime" />
 ```
 Either way adds the source generator to your project. Make sure to add `PrivateAssets="all" ExcludeAssets="runtime"` to mark it as a build dependency. Otherwise, it flows to projects which depend on your project.
 
@@ -90,7 +90,6 @@ With this added the consuming project the generator picks the values up and adds
 > To avoid wrong method resolution when your CSLA methods have the same name as the operation they perform. E.g. the method name is `Fetch()` for the `[Fetch]` attribute. Use either the prefix or suffix configuration to make them different from the methods provided from `IDataPortal`.
 
 ### Roadmap
-- Special case commands to an extension like `commandPortal.ExecuteCommand(<params>)` which combines `Create`+`Execute`.
 - Support for generic business objects
 - Add attribute to exclude methods explicitly
 
