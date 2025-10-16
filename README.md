@@ -3,7 +3,7 @@
 
 _![NuGet Version Generator](https://img.shields.io/nuget/v/Ossendorf.Csla.DataPortalExtensionGenerator?label=Generator)_
 _![GitHub Release](https://img.shields.io/github/v/release/StefanOssendorf/Csla.DataPortalExtensions?include_prereleases)_  
-_![NuGet Version Analyzer](https://img.shields.io/nuget/v/Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers?label=Analyzer)__
+_![NuGet Version Analyzer](https://img.shields.io/nuget/v/Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers?label=Analyzer)_
 
 _[![PullRequest Validation](https://github.com/StefanOssendorf/Csla.DataPortalExtensions/actions/workflows/pr-ci.yml/badge.svg?branch=master)](https://github.com/StefanOssendorf/Csla.DataPortalExtensions/actions/workflows/pr-ci.yml)_
 
@@ -19,10 +19,10 @@ dotnet add package Ossendorf.Csla.DataPortalExtensionsGenerator
 ```xml
 <PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="0.4.0-preview1" PrivateAssets="all" ExcludeAssets="runtime" />
 ```
-Either way adds the source generator to your project. Make sure to add `PrivateAssets="all" ExcludeAssets="runtime"` to mark it as a build dependency. Otherwise it flows to projects which depend on your project.
+Either way adds the source generator to your project. Make sure to add `PrivateAssets="all" ExcludeAssets="runtime"` to mark it as a build dependency. Otherwise, it flows to projects which depend on your project.
 
 
-To use the generator, add the `[Ossendorf.Csla.DataPortalExtensionsGenerator.DataPortalExtensions]` attribute to a class which should containt the extensions.  
+To use the generator, add the `[Ossendorf.Csla.DataPortalExtensionsGenerator.DataPortalExtensions]` attribute to a class which should contain the extensions.  
 For example:
 ```csharp
 [Ossendorf.Csla.DataPortalExtensionsGenerator.DataPortalExtensions]
@@ -89,7 +89,7 @@ With this added the consuming project the generator picks the values up and adds
 > [!TIP]
 > To avoid wrong method resolution when your CSLA methods have the same name as the operation they perform. E.g. the method name is `Fetch()` for the `[Fetch]` attribute. Use either the prefix or suffix configuration to make them different from the methods provided from `IDataPortal`.
 
-### Raodmap
+### Roadmap
 - Special case commands to an extension like `commandPortal.ExecuteCommand(<params>)` which combines `Create`+`Execute`.
 - Support for generic business objects
 - Add attribute to exclude methods explicitly
