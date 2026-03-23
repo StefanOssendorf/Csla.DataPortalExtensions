@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Microsoft.CodeAnalysis;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
 using System.Collections;

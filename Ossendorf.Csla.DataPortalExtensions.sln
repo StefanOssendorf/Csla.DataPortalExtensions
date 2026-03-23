@@ -28,8 +28,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test", "tests\Csla.DataPortalExtensionGenerator.Analyzers.Test\Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test.csproj", "{1DC38685-54BB-4E42-91B8-875576455CD5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csla.DataPortalExtensionGenerator.Analyzers.Vsix", "src\Csla.DataPortalExtensionGenerator.Analyzers.Vsix\Csla.DataPortalExtensionGenerator.Analyzers.Vsix.csproj", "{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes", "src\Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes\Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.CodeFixes.csproj", "{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ossendorf.Csla.DataPortalExtensionGenerator.Attributes", "src\Csla.DataPortalExtensionGenerator.Attributes\Ossendorf.Csla.DataPortalExtensionGenerator.Attributes.csproj", "{01D5FECB-C502-4399-AD91-4E0476B734A4}"
@@ -72,10 +70,6 @@ Global
 		{1DC38685-54BB-4E42-91B8-875576455CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DC38685-54BB-4E42-91B8-875576455CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DC38685-54BB-4E42-91B8-875576455CD5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -97,7 +91,6 @@ Global
 		{E2E4D266-9FE6-4545-8C85-E7BFBAEF0727} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
 		{11ED6E2C-88E6-4A6C-9EFB-E6F1DFE3BD0D} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
 		{1DC38685-54BB-4E42-91B8-875576455CD5} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
-		{C99E5801-D3CD-48DD-9B35-8207DBA45ADE} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
 		{CD8088E3-B650-4E5A-AC81-B2C0D23A353C} = {B446CD63-FAD5-4D05-B0DC-8A9FD6AA7C0C}
 		{563C2157-E292-4A04-B029-0CB1B67E8A21} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
