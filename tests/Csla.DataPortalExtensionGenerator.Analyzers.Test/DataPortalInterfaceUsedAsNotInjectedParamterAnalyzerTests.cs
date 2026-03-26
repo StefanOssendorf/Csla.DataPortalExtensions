@@ -13,10 +13,10 @@ using Csla;
 
 namespace TestNamespace;
 
-public class Testing {{
+public class Testing : Csla.Core.ICslaObject {{
     
     [Fetch]
-    private void Foo(string a, {{|DPEG1001:{portalType}<string> portal|}}){{
+    private void Foo(string a, {{|DPEG1001:{portalType}<Testing> portal|}}){{
     }}
 }}";
         await VerifyCS.VerifyAnalyzerAsync(cslaSource);
@@ -31,10 +31,10 @@ using Csla;
 
 namespace TestNamespace;
 
-public class Testing {{
+public class Testing : Csla.Core.ICslaObject {{
     
     [Fetch]
-    private void Foo(string a, [Inject] {portalType}<string> portal){{
+    private void Foo(string a, [Inject] {portalType}<Testing> portal){{
     }}
 }}";
         await VerifyCS.VerifyAnalyzerAsync(cslaSource);

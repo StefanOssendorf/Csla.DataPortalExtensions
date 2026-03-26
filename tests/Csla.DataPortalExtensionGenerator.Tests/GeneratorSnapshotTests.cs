@@ -30,7 +30,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBO {{
+public class DummyBO : Csla.Core.ICslaObject {{
     
     [{portalMethod}]
     private void Foo() {{
@@ -49,7 +49,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar({type}[] krznbf) {{
     }}
@@ -67,7 +67,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar({type} krznbf) {{
     }}
@@ -85,7 +85,7 @@ using System;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(int? id, string krznbf, Guid reference) {{
     }}
@@ -102,7 +102,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
     }}
@@ -119,7 +119,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(int? id, string krznbf, decimal reference, [Inject] IDataPortalFactory dpf, string abcdefg = """") {{
     }}
@@ -136,7 +136,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar([Inject] IDataPortalFactory dpf, [Inject] IChildDataPortalFactory cdpf) {{
     }}
@@ -154,7 +154,7 @@ using MyTest.Greats;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(int? id, Foo.Bar krznbf, decimal reference, [Inject] IDataPortalFactory dpf) {{
     }}
@@ -182,7 +182,7 @@ using Csla;
 namespace VerifyTests;
 
 public class DummyBOWithParams {{
-    public class InnerDummy {{
+    public class InnerDummy : Csla.Core.ICslaObject {{
         [Fetch]
         private void Bar() {{
         }}
@@ -201,7 +201,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar({type}? krznbf) {{
     }}
@@ -219,7 +219,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar({type}[]? krznbf = null) {{
     }}
@@ -238,7 +238,7 @@ using System.Collections.Generic;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(IEnumerable<Guid> krznbf) {{
     }}
@@ -292,7 +292,7 @@ using TestEnum;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(SomeEnum? krznbf) {{
     }}
@@ -319,7 +319,7 @@ using TestEnum;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(SomeEnum krznbf) {{
     }}
@@ -346,7 +346,7 @@ using TestInternal;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(string a, SomeInternalType b) {{
     }}
@@ -372,7 +372,7 @@ using System.Collections.Generic;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(string a, int b = 1, List<string>? list = null, string? x = null, string z = """") {{
     }}
@@ -389,7 +389,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(string a, int b = 1, int[]? c = null, string? x = null) {{
     }}
@@ -407,7 +407,7 @@ using TestEnum;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(SomeEnum krznbf = SomeEnum.Some) {{
     }}
@@ -433,7 +433,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(int krznbf) {{
     }}
@@ -457,7 +457,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(int krznbf) {{
     }}
@@ -475,7 +475,7 @@ using Csla;
 
 namespace VerifyTests;
 
-public class DummyBOWithParams {{
+public class DummyBOWithParams : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(int krznbf) {{
     }}
