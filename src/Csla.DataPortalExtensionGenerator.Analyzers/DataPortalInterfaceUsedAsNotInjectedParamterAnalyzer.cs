@@ -13,7 +13,7 @@ public sealed class DataPortalInterfaceUsedAsNotInjectedParamterAnalyzer : Diagn
     /// <summary>
     /// The diagnostic id.
     /// </summary>
-    public const string DiagnosticId = Constants.DiagnosticId.DataPortalInterfaceUsedAsNotInjectedParamter;
+    public const string DiagnosticId = Constants.DiagnosticId.DataPortalInterfaceUsedAsNotInjectedParameter;
     private const string Category = Constants.Category.Usage;
 
     private static readonly LocalizableString _title = new LocalizableResourceString(nameof(Resources.DPEG1001Title), Resources.ResourceManager, typeof(Resources));

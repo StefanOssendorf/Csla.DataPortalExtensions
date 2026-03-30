@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using FluentAssertions.Execution;
+﻿using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Microsoft.CodeAnalysis;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests.Helper;
