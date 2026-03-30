@@ -1,6 +1,6 @@
 using Csla;
 
-namespace Ossendorf.Csla.DataPortalExtensionsGenerator.Tests.CsprojConfig;
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests.CsprojConfig;
 
 public class GeneratorConfigTests {
     [Fact]

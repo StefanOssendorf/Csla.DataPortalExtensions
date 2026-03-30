@@ -29,10 +29,10 @@ using System.Threading.Tasks;
 
 namespace TestNamespace {{
 
-    public class Testing {{
+    public class Testing : Csla.Core.ICslaObject {{
     
         public async Task Test1() {{
-            IDataPortal<string> fooPortal = null!;
+            IDataPortal<Testing> fooPortal = null!;
 
             {methodCodeLine}
         }}
@@ -64,10 +64,10 @@ using System.Threading.Tasks;
 
 namespace TestNamespace {{
 
-    public class Testing {{
+    public class Testing : Csla.Core.ICslaObject {{
     
         public async Task Test1() {{
-            IChildDataPortal<string> fooPortal = null!;
+            IChildDataPortal<Testing> fooPortal = null!;
 
             {methodCodeLine}
         }}
@@ -84,12 +84,13 @@ using System.Threading.Tasks;
 
 namespace TestNamespace {{
 
-    public class Testing {{
+    public class Testing : Csla.Core.ICslaObject {{
     
         public async Task Test1() {{
-            IDataPortal<string> fooPortal = null!;
+            IDataPortal<Testing> fooPortal = null!;
+            Testing foo = null!;
 
-            var x = await fooPortal.UpdateAsync(""asdad"");
+            var x = await fooPortal.UpdateAsync(foo);
         }}
     }}
 }}";
@@ -105,12 +106,13 @@ using System.Threading.Tasks;
 
 namespace TestNamespace {{
 
-    public class Testing {{
+    public class Testing : Csla.Core.ICslaObject {{
     
         public async Task Test1() {{
-            IChildDataPortal<string> fooPortal = null!;
+            IChildDataPortal<Testing> fooPortal = null!;
+            Testing foo = null!;
 
-            await fooPortal.UpdateChildAsync(""asdad"");
+            await fooPortal.UpdateChildAsync(foo);
         }}
     }}
 }}";

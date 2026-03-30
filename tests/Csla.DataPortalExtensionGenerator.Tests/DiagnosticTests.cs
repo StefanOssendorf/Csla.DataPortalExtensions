@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Microsoft.CodeAnalysis;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Tests.Helper;
 
@@ -50,7 +50,7 @@ using Csla;
 
 namespace SomeCslaClass;
 
-public class Foo {{
+public class Foo : Csla.Core.ICslaObject {{
     [Fetch]
     private void Bar(string? x, string? z = null){{ }}
 }}
