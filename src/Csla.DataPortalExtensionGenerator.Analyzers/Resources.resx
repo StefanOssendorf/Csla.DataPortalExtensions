@@ -135,4 +135,13 @@
   <data name="DPEG1001Title" xml:space="preserve">
     <value>I(Child)DataPortal must be injected</value>
   </data>
+  <data name="DPEG1002Description" xml:space="preserve">
+    <value>Synchronous data portal methods block the calling thread and should be avoided. Use the type and compile safe generated extension methods instead.</value>
+  </data>
+  <data name="DPEG1002MessageFormat" xml:space="preserve">
+    <value>The synchronous data portal method '{0}' should not be used. Use a generated extension method instead.</value>
+  </data>
+  <data name="DPEG1002Title" xml:space="preserve">
+    <value>Synchronous Csla data portal method is used</value>
+  </data>
 </root>
