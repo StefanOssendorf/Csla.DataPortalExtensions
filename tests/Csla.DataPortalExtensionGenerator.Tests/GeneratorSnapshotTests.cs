@@ -584,6 +584,26 @@ public class DummyCmd : CommandBase<DummyCmd> {{
     }
 
     [Fact]
+    public Task GenerateNoDataPortalExtensionAttributeExcludesMethod() {
+        var cslaSource = @"
+using Csla;
+using Ossendorf.Csla.DataPortalExtensionGenerator;
+
+namespace VerifyTests;
+
+public class DummyBO : Csla.Core.ICslaObject {
+    [Fetch]
+    private void FetchWithExtension(int id) { }
+
+    [Fetch]
+    [GenerateNoDataPortalExtension]
+    private void FetchWithoutExtension(string name) { }
+}
+";
+        return SourceGenTester.Verify(cslaSource);
+    }
+
+    [Fact]
     public Task ExecuteAndMultipleCreates() {
         var cslaSource = $@"
 using Csla;

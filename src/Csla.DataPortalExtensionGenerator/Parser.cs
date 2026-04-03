@@ -43,6 +43,10 @@ internal static class Parser {
     public static Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)> GetPortalMethods(GeneratorAttributeSyntaxContext ctx, DataPortalMethod dataPortalMethod, CancellationToken ct) {
 
         var methodDeclaration = (MethodDeclarationSyntax)ctx.TargetNode;
+        if (HasGenerateNoExtensionAttribute(methodDeclaration)) {
+            return Result<PortalOperationToGenerate>.NotValid();
+        }
+
         if (!GetPortalObject(ctx.TargetNode.Parent, ctx.SemanticModel, ct, out var portalObject)) {
             return Result<PortalOperationToGenerate>.NotValid();
         }
@@ -207,6 +211,20 @@ internal static class Parser {
     }
 
     #endregion
+
+    private static bool HasGenerateNoExtensionAttribute(MethodDeclarationSyntax method) {
+        for (var i = 0; i < method.AttributeLists.Count; i++) {
+            var al = method.AttributeLists[i];
+            for (var j = 0; j < al.Attributes.Count; j++) {
+                var name = ExtractAttributeName(al.Attributes[j].Name);
+                if (name.Equals("GenerateNoDataPortalExtension", StringComparison.Ordinal)
+                    || name.Equals("GenerateNoDataPortalExtensionAttribute", StringComparison.Ordinal)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     private static string ExtractAttributeName(NameSyntax? name) {
         return name switch {
