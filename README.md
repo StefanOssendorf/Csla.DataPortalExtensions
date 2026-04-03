@@ -17,10 +17,12 @@ _[![PullRequest Validation](https://github.com/StefanOssendorf/Csla.DataPortalEx
 dotnet add package Ossendorf.Csla.DataPortalExtensionsGenerator
 ```
 ```xml
-<PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="1.0.1" PrivateAssets="all" />
+<PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="1.0.1" />
 ```
-Either way adds the source generator to your project. Make sure to add `PrivateAssets="all"` to mark it as a build dependency so it does not flow to projects which depend on your project.
-
+Either way adds the source generator to your project.
+> [!NOTE]  
+> If you are only using the `DataPortalExtensions` attribute and not the `GenerateNoDataPortalExtension` attribute, you can add `PrivateAssets="all"` to mark it as a build dependency, which prevents it from flowing to projects that depend on yours.
+> When using the `GenerateNoDataPortalExtension` attribute, CSLA needs access to the Attributes.dll file shipped within the generator while inspecting data portal methods. Otherwise, a runtime exception will occur.
 
 To use the generator, add the `[Ossendorf.Csla.DataPortalExtensionsGenerator.DataPortalExtensions]` attribute to a class which should contain the extensions.  
 For example:
