@@ -5,16 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Build
 dotnet build
-
-# Test
 dotnet test
-
-# Run a single test class
 dotnet test --filter "FullyQualifiedName~GeneratorSnapshotTests"
-
-# Pack NuGet packages
 dotnet pack -c Release -o artifacts/
 ```
 
@@ -27,6 +20,20 @@ VERIFY_AUTO_APPROVE_ALL=true dotnet test
 ```
 
 Snapshots live in `tests/Csla.DataPortalExtensionGenerator.Tests/Snapshots/`.
+
+## Workflows
+
+### Making changes to the codebase
+When making any kind of change:
+1. Work with up-to-date master branch
+2. Create a new branch following the scheme for each type of task
+   1. Feature Branch: feature/<gh issue numbber>-<short description>
+   2. Bug Branch: bug/<gh issue number>-<short description>
+   3. Code clean up Branch: cleanup/<gh issue number>-<short description>
+   4. Everything else: misc/<gh issue number>-<short description>
+3. Plan the changes, including new/updated methods, AnalyzersReleases.*.md modification
+4. Implement the changes
+5. Add passing tests to verify it's working
 
 ## Architecture
 
