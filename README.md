@@ -17,10 +17,12 @@ _[![PullRequest Validation](https://github.com/StefanOssendorf/Csla.DataPortalEx
 dotnet add package Ossendorf.Csla.DataPortalExtensionsGenerator
 ```
 ```xml
-<PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="1.0.1" PrivateAssets="all" ExcludeAssets="runtime" />
+<PackageReference Include="Ossendorf.Csla.DataPortalExtensionsGenerator" Version="1.0.1" />
 ```
-Either way adds the source generator to your project. Make sure to add `PrivateAssets="all" ExcludeAssets="runtime"` to mark it as a build dependency. Otherwise, it flows to projects which depend on your project.
-
+Either way adds the source generator to your project.
+> [!NOTE]  
+> If you are only using the `DataPortalExtensions` attribute and not the `GenerateNoDataPortalExtension` attribute, you can add `PrivateAssets="all"` to mark it as a build dependency, which prevents it from flowing to projects that depend on yours.
+> When using the `GenerateNoDataPortalExtension` attribute, CSLA needs access to the Attributes.dll file shipped within the generator while inspecting data portal methods. Otherwise, a runtime exception will occur.
 
 To use the generator, add the `[Ossendorf.Csla.DataPortalExtensionsGenerator.DataPortalExtensions]` attribute to a class which should contain the extensions.  
 For example:
@@ -64,6 +66,21 @@ static partial class DataPortalExtensions {
 > In the example above the _last_ extension methods has the name `Fetch` which is already defined by the `IDataPortal` interface. That means the extension method is **never** used, because the compiler resolves the instance method and _not_ the extension method to be used.  
 > To avoid that use the configuration explained next.
 
+### Excluding methods from generation
+
+To prevent a specific portal method from having an extension method generated, annotate it with `[GenerateNoDataPortalExtension]`:
+
+```csharp
+public class Address : BusinessBase<Address> {
+    [Create]
+    private void CreateLocally() { }
+
+    [Fetch]
+    [GenerateNoDataPortalExtension]
+    private async Task ById(Guid id) { } // no extension method generated for this
+}
+```
+
 ## How to configure the generator
 
 You can configure the following for the generator to respect
@@ -91,7 +108,6 @@ With this added the consuming project the generator picks the values up and adds
 
 ### Roadmap
 - Support for generic business objects
-- Add attribute to exclude methods explicitly
 
 A lot of implementation details are derived/taken from the great series [Andrew Lock: Creating a source generator](https://andrewlock.net/series/creating-a-source-generator/). If you want to create your own source generator I can recommend that series wholeheartedly.
 
