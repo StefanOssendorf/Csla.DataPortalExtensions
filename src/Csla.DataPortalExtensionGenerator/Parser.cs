@@ -124,18 +124,6 @@ internal static class Parser {
             }
 
             return false;
-
-            static string EnsureAttributeSuffix(string attributeName) {
-                if (string.IsNullOrWhiteSpace(attributeName)) {
-                    return "";
-                }
-
-                if (attributeName.EndsWith("Attribute")) {
-                    return attributeName;
-                }
-
-                return $"{attributeName}Attribute";
-            }
         }
 
         static bool HasPublicVisibility(ITypeSymbol typeSymbol, List<DiagnosticInfo> diagnostics, DataPortalMethod dataPortalMethod, MethodDeclarationSyntax methodSyntax) {
@@ -216,9 +204,8 @@ internal static class Parser {
         for (var i = 0; i < method.AttributeLists.Count; i++) {
             var al = method.AttributeLists[i];
             for (var j = 0; j < al.Attributes.Count; j++) {
-                var name = ExtractAttributeName(al.Attributes[j].Name);
-                if (name.Equals("GenerateNoDataPortalExtension", StringComparison.Ordinal)
-                    || name.Equals("GenerateNoDataPortalExtensionAttribute", StringComparison.Ordinal)) {
+                var name = EnsureAttributeSuffix(ExtractAttributeName(al.Attributes[j].Name));
+                if (name.Equals("GenerateNoDataPortalExtensionAttribute", StringComparison.Ordinal)) {
                     return true;
                 }
             }
@@ -226,6 +213,18 @@ internal static class Parser {
         return false;
     }
 
+    private static string EnsureAttributeSuffix(string attributeName) {
+        if (string.IsNullOrWhiteSpace(attributeName)) {
+            return "";
+        }
+
+        if (attributeName.EndsWith("Attribute")) {
+            return attributeName;
+        }
+
+        return $"{attributeName}Attribute";
+    }
+    
     private static string ExtractAttributeName(NameSyntax? name) {
         return name switch {
             SimpleNameSyntax ins => ins.Identifier.Text,
