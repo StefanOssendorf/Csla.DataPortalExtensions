@@ -78,6 +78,10 @@ Consuming projects can set these properties to customize generated method names:
 
 Property names are defined in `ConfigConstants.cs`. Generated methods are intentionally not async-suffixed by design.
 
+## Code style
+
+- All methods, including static local functions, must use **PascalCase** naming.
+
 ## Versioning
 
 Uses MinVer — version is derived from git tags with prefix `v` (e.g., `v1.2.3`). Minimum version: `0.1`, pre-release identifier: `preview.0`.
