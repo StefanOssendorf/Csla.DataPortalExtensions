@@ -16,14 +16,10 @@ internal static class StringBuilderExtensions {
 
     public static StringBuilder AppendMethodsGroupedByClass(this StringBuilder sb, in ImmutableArray<PortalOperationToGenerate> foundOperations, in GeneratorOptions options, CancellationToken ct) {
 
-        var groupedByClass = foundOperations.Cast<PortalOperationToGenerate>().GroupBy(o => o.Object).ToImmutableArray();
+        var groupedByClass = foundOperations.GroupBy(o => o.Object).ToImmutableArray();
 
         foreach (var operationsByClass in groupedByClass) {
             ct.ThrowIfCancellationRequested();
-
-            if (!operationsByClass.Any()) {
-                continue;
-            }
 
             var boName = operationsByClass.Key.GloballyQualifiedName;
 
@@ -63,8 +59,19 @@ internal static class StringBuilderExtensions {
         }
     }
 
-    private static string GetVisibilityModifier(PortalObject operationsByClass, PortalOperationToGenerate operation)
-        => operationsByClass.HasPublicModifier && operation.Parameters.All(p => p.IsPublic) ? "public" : "internal";
+    private static string GetVisibilityModifier(PortalObject operationsByClass, PortalOperationToGenerate operation) {
+        if (!operationsByClass.HasPublicModifier) {
+            return "internal";
+        }
+
+        for (var i = 0; i < operation.Parameters.Count; i++) {
+            if (!operation.Parameters[i].IsPublic) {
+                return "internal";
+            }
+        }
+
+        return "public";
+    }
 
     private static (StringBuilder Parameters, StringBuilder Arguments) GetParametersAndArgumentsToUse(EquatableArray<OperationParameter> parameters, CancellationToken ct) {
         var parametersBuilder = new StringBuilder();
@@ -139,7 +146,7 @@ internal static class StringBuilderExtensions {
     }
 
     public static StringBuilder AppendVariableName(this StringBuilder sb, ParameterSyntax parameter)
-        => sb.Append(parameter.Identifier.ToString());
+        => sb.Append(parameter.Identifier.ValueText);
 
     public static StringBuilder AppendDefaultValue(this StringBuilder sb, ParameterSyntax parameter, ITypeSymbol parameterTypeSymbol, IParameterSymbol parameterDeclaredSymbol) {
         if (parameter.Default is null) {
@@ -158,8 +165,8 @@ internal static class StringBuilderExtensions {
     public static StringBuilder AddClassContent(this StringBuilder sb, Func<StringBuilder, StringBuilder> addClassContent) => addClassContent(sb);
 
     public static StringBuilder AppendCreateAndExecuteMethods(this StringBuilder sb, ImmutableArray<PortalOperationToGenerate> executes, ImmutableArray<PortalOperationToGenerate> creates, GeneratorOptions options, CancellationToken ct) {
-        var groupedCreates = creates.GroupBy(c => c.Object).ToImmutableDictionary(k => k.Key, v => v.ToImmutableArray());
-        var groupedExecutes = executes.GroupBy(e => e.Object).ToImmutableDictionary(k => k.Key, v => v.ToImmutableArray());
+        var groupedCreates = GroupByObject(creates);
+        var groupedExecutes = GroupByObject(executes);
 
         const string thisCommandArgumentName = "__dpeg_command";
         const string localVariableCommandName = "__dpeg_tmp_cmd";
@@ -220,5 +227,23 @@ internal static class StringBuilderExtensions {
 
     private static StringBuilder AppendMethodName(this StringBuilder sb, string methodName, GeneratorOptions options)
         => sb.Append(options.MethodPrefix).Append(methodName).Append(options.MethodSuffix);
+
+    private static Dictionary<PortalObject, ImmutableArray<PortalOperationToGenerate>> GroupByObject(ImmutableArray<PortalOperationToGenerate> operations) {
+        var dict = new Dictionary<PortalObject, ImmutableArray<PortalOperationToGenerate>.Builder>();
+        for (var i = 0; i < operations.Length; i++) {
+            var op = operations[i];
+            if (!dict.TryGetValue(op.Object, out var builder)) {
+                builder = ImmutableArray.CreateBuilder<PortalOperationToGenerate>();
+                dict[op.Object] = builder;
+            }
+            builder.Add(op);
+        }
+
+        var result = new Dictionary<PortalObject, ImmutableArray<PortalOperationToGenerate>>(dict.Count);
+        foreach (var kvp in dict) {
+            result[kvp.Key] = kvp.Value.ToImmutable();
+        }
+        return result;
+    }
 
 }
