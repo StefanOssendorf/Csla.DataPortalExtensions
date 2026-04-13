@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Internals;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -53,11 +54,11 @@ internal static class Parser {
 
         ct.ThrowIfCancellationRequested();
 
-        var diagnostics = new List<DiagnosticInfo>();
-        var parameters = GetRelevantParametersForMethod(methodDeclaration, ctx.SemanticModel, ct, dataPortalMethod, diagnostics);
-        var errors = new EquatableArray<DiagnosticInfo>([.. diagnostics]);
+        List<DiagnosticInfo>? diagnostics = null;
+        var parameters = GetRelevantParametersForMethod(methodDeclaration, ctx.SemanticModel, ct, dataPortalMethod, ref diagnostics);
+        var errors = diagnostics is null ? EquatableArray<DiagnosticInfo>.Empty : new EquatableArray<DiagnosticInfo>(diagnostics.ToArray());
 
-        var methodName = methodDeclaration.Identifier.ToString();
+        var methodName = methodDeclaration.Identifier.ValueText;
         return new Result<(PortalOperationToGenerate PortalOperationToGenerate, bool IsValid)>((new PortalOperationToGenerate(methodName, parameters, dataPortalMethod, portalObject.Value), true), errors);
     }
 
@@ -73,18 +74,24 @@ internal static class Parser {
             return false;
         }
 
-        var objectHasPublicModifier = classDeclaration.Modifiers.Any(x => x.ToString().Equals("public", StringComparison.OrdinalIgnoreCase));
-        portalObject = new PortalObject(objectHasPublicModifier, $"global::{classSymbol}");
+        var objectHasPublicModifier = false;
+        for (var i = 0; i < classDeclaration.Modifiers.Count; i++) {
+            if (classDeclaration.Modifiers[i].IsKind(SyntaxKind.PublicKeyword)) {
+                objectHasPublicModifier = true;
+                break;
+            }
+        }
+        portalObject = new PortalObject(objectHasPublicModifier, classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
         return true;
     }
 
-    private static EquatableArray<OperationParameter> GetRelevantParametersForMethod(MethodDeclarationSyntax methodSyntax, SemanticModel semanticModel, CancellationToken ct, DataPortalMethod dataPortalMethod, List<DiagnosticInfo> diagnostics) {
+    private static EquatableArray<OperationParameter> GetRelevantParametersForMethod(MethodDeclarationSyntax methodSyntax, SemanticModel semanticModel, CancellationToken ct, DataPortalMethod dataPortalMethod, ref List<DiagnosticInfo>? diagnostics) {
         var methodParameters = methodSyntax.ParameterList.Parameters;
         if (methodParameters.Count == 0) {
             return EquatableArray<OperationParameter>.Empty;
         }
 
-        var foundParameters = new List<OperationParameter>();
+        var foundParameters = ImmutableArray.CreateBuilder<OperationParameter>(methodParameters.Count);
         for (var i = 0; i < methodParameters.Count; i++) {
             ct.ThrowIfCancellationRequested();
 
@@ -102,13 +109,13 @@ internal static class Parser {
                 continue;
             }
 
-            var hasPublicModifier = HasPublicVisibility(parameterTypeSymbol, diagnostics, dataPortalMethod, methodSyntax);
+            var hasPublicModifier = HasPublicVisibility(parameterTypeSymbol, ref diagnostics, dataPortalMethod, methodSyntax);
             var parametersFormattedForUsage = FormatForParameterUsage(parameter, parameterTypeSymbol, parameterDeclaredSymbol);
-            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ToString(), parametersFormattedForUsage, hasPublicModifier));
+            foundParameters.Add(new OperationParameter(parameterTypeSymbol.ContainingNamespace?.ToString() ?? "", parameter.Identifier.ValueText, parametersFormattedForUsage, hasPublicModifier));
         }
 
         ct.ThrowIfCancellationRequested();
-        return new EquatableArray<OperationParameter>([.. foundParameters]);
+        return new EquatableArray<OperationParameter>(foundParameters.ToArray());
 
         static bool IsInjectedParameter(ParameterSyntax parameter) {
             for (var i = 0; i < parameter.AttributeLists.Count; i++) {
@@ -126,13 +133,14 @@ internal static class Parser {
             return false;
         }
 
-        static bool HasPublicVisibility(ITypeSymbol typeSymbol, List<DiagnosticInfo> diagnostics, DataPortalMethod dataPortalMethod, MethodDeclarationSyntax methodSyntax) {
+        static bool HasPublicVisibility(ITypeSymbol typeSymbol, ref List<DiagnosticInfo>? diagnostics, DataPortalMethod dataPortalMethod, MethodDeclarationSyntax methodSyntax) {
             if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol) {
                 typeSymbol = arrayTypeSymbol.ElementType;
             }
 
             if (typeSymbol.DeclaredAccessibility == Accessibility.Private) {
-                diagnostics.Add(PrivateClassCanNotBeAParameterDiagnostic.Create(methodSyntax, dataPortalMethod, methodSyntax.Identifier.ToString(), typeSymbol.ToDisplayString()));
+                diagnostics ??= new List<DiagnosticInfo>();
+                diagnostics.Add(PrivateClassCanNotBeAParameterDiagnostic.Create(methodSyntax, dataPortalMethod, methodSyntax.Identifier.ValueText, typeSymbol.ToDisplayString()));
             }
 
             return typeSymbol.DeclaredAccessibility == Accessibility.Public;
