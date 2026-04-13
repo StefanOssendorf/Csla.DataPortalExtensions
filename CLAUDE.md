@@ -37,7 +37,7 @@ When making any kind of change:
 
 ## Architecture
 
-This is a **Roslyn incremental source generator** (`IIncrementalGenerator`) that generates strongly-typed extension methods for CSLA.NET's `IDataPortal<T>` and `IChildDataPortal<T>` interfaces. Consuming projects decorate a `partial static class` with `[DataPortalExtensions]`, and the generator produces extension methods wrapping each CSLA portal method tagged with `[Fetch]`, `[FetchChild]`, `[Create]`, `[CreateChild]`, `[Delete]`, or `[Execute]`.
+This is a **Roslyn incremental source generator** (`IIncrementalGenerator`) that generates strongly-typed extension methods for CSLA.NET's `IDataPortal<T>` and `IChildDataPortal<T>` interfaces. Consuming projects decorate a `partial static class` with `[DataPortalExtensions]`, and the generator produces extension methods wrapping each CSLA portal method tagged with `[Fetch]`, `[FetchChild]`, `[Create]`, `[CreateChild]`, `[Delete]`, or `[Execute]`. Annotate a method with `[GenerateNoDataPortalExtension]` to exclude it from generation.
 
 ### Source projects (`src/`)
 
@@ -56,6 +56,10 @@ This is a **Roslyn incremental source generator** (`IIncrementalGenerator`) that
 - **`GeneratorOptions.cs`** / **`OptionsGeneratorPart.cs`** — Reads MSBuild properties into a `GeneratorOptions` record passed through the pipeline
 - **`Diagnostics/`** — Typed diagnostic descriptors (e.g., `NotPartialDiagnostic`, `PrivateClassCanNotBeAParameterDiagnostic`)
 - **`Internals/EquatableArray<T>`** — Value-equality array wrapper required for incremental generator caching correctness
+
+### Diagnostics
+
+Analyzer diagnostics are tracked in `src/Csla.DataPortalExtensionGenerator.Analyzers/AnalyzerReleases.Shipped.md` and `AnalyzerReleases.Unshipped.md`. Generator diagnostics (DPEGEN001–004) are defined in `src/Csla.DataPortalExtensionGenerator/Diagnostics/`.
 
 ### Tests (`tests/`)
 
@@ -80,7 +84,7 @@ Property names are defined in `ConfigConstants.cs`. Generated methods are intent
 
 ## Code style
 
-- All methods, including static local functions, must use **PascalCase** naming.
+Conventions are enforced via `.editorconfig`.
 
 ## Versioning
 
