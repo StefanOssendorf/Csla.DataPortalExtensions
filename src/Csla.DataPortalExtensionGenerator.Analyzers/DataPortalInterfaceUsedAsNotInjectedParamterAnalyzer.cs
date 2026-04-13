@@ -30,26 +30,58 @@ public sealed class DataPortalInterfaceUsedAsNotInjectedParamterAnalyzer : Diagn
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
 
-        context.RegisterSymbolAction(AnalyzePortalMethod, SymbolKind.Method);
+        context.RegisterCompilationStartAction(compilationStart => {
+            var compilation = compilationStart.Compilation;
+
+            var dataPortal = CompilationHelper.ResolveType(compilation, "Csla.IDataPortal`1");
+            if (dataPortal is null) {
+                return;
+            }
+
+            var childDataPortal = CompilationHelper.ResolveType(compilation, "Csla.IChildDataPortal`1");
+            if (childDataPortal is null) {
+                return;
+            }
+
+            var portalAttributeTypes = ResolvePortalAttributeTypes(compilation);
+            if (portalAttributeTypes.IsEmpty) {
+                return;
+            }
+
+            var injectAttribute = CompilationHelper.ResolveType(compilation, "Csla.InjectAttribute")!;
+
+            compilationStart.RegisterSymbolAction(ctx => AnalyzePortalMethod(ctx, dataPortal, childDataPortal, portalAttributeTypes, injectAttribute), SymbolKind.Method);
+        });
     }
 
-    private static readonly ImmutableHashSet<string> _portalAttributes = ImmutableHashSet.Create(
-        "CreateAttribute",
-        "FetchAttribute",
-        "InsertAttribute",
-        "UpdateAttribute",
-        "ExecuteAttribute",
-        "DeleteAttribute",
-        "DeleteSelfAttribute",
-        "CreateChildAttribute",
-        "FetchChildAttribute",
-        "InsertChildAttribute",
-        "UpdateChildAttribute",
-        "DeleteSelfChildAttribute",
-        "ExecuteChildAttribute"
-    );
+    private static readonly ImmutableArray<string> _portalAttributeMetadataNames = [
+        "Csla.CreateAttribute",
+        "Csla.FetchAttribute",
+        "Csla.InsertAttribute",
+        "Csla.UpdateAttribute",
+        "Csla.ExecuteAttribute",
+        "Csla.DeleteAttribute",
+        "Csla.DeleteSelfAttribute",
+        "Csla.CreateChildAttribute",
+        "Csla.FetchChildAttribute",
+        "Csla.InsertChildAttribute",
+        "Csla.UpdateChildAttribute",
+        "Csla.DeleteSelfChildAttribute",
+        "Csla.ExecuteChildAttribute"
+    ];
 
-    private void AnalyzePortalMethod(SymbolAnalysisContext context) {
+    private static ImmutableHashSet<INamedTypeSymbol> ResolvePortalAttributeTypes(Compilation compilation) {
+        var builder = ImmutableHashSet.CreateBuilder<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+        foreach (var metadataName in _portalAttributeMetadataNames) {
+            var type = compilation.GetTypeByMetadataName(metadataName);
+            if (type is not null) {
+                builder.Add(type);
+            }
+        }
+        return builder.ToImmutable();
+    }
+
+    private static void AnalyzePortalMethod(SymbolAnalysisContext context, INamedTypeSymbol dataPortal, INamedTypeSymbol childDataPortal, ImmutableHashSet<INamedTypeSymbol> portalAttributeTypes, INamedTypeSymbol injectAttribute) {
         if (context.IsGeneratedCode) {
             return;
         }
@@ -61,36 +93,49 @@ public sealed class DataPortalInterfaceUsedAsNotInjectedParamterAnalyzer : Diagn
             return;
         }
 
-        if (!HasCslaAttribute(methodSymbol, _portalAttributes.Contains, context.CancellationToken)) {
+        if (!HasPortalAttribute(methodAttributes, portalAttributeTypes, context.CancellationToken)) {
             return;
         }
 
         foreach (var parameter in methodSymbol.Parameters) {
+            var parameterOriginalType = parameter.Type.OriginalDefinition;
 
-            if (parameter.Type is not { ContainingNamespace.Name: "Csla", Name: "IDataPortal" or "IChildDataPortal" }) {
+            if (!SymbolEqualityComparer.Default.Equals(parameterOriginalType, dataPortal) &&
+                !SymbolEqualityComparer.Default.Equals(parameterOriginalType, childDataPortal)) {
                 continue;
             }
 
-            if (HasCslaAttribute(parameter, static name => name == "InjectAttribute", context.CancellationToken)) {
+            if (HasInjectAttribute(parameter, injectAttribute, context.CancellationToken)) {
                 continue;
             }
 
-            var parameterSyntax = parameter.DeclaringSyntaxReferences.First().GetSyntax();
+            var parameterSyntax = parameter.DeclaringSyntaxReferences[0].GetSyntax();
             context.ReportDiagnostic(Diagnostic.Create(_rule, parameterSyntax.GetLocation(), parameter.Name));
         }
     }
 
-    private static bool HasCslaAttribute(ISymbol symbol, Func<string, bool> isAttribute, CancellationToken ct) {
-        var methodAttributes = symbol.GetAttributes();
-        if (methodAttributes.IsDefaultOrEmpty) {
+    private static bool HasPortalAttribute(ImmutableArray<AttributeData> attributes, ImmutableHashSet<INamedTypeSymbol> portalAttributeTypes, CancellationToken ct) {
+        for (var i = 0; i < attributes.Length; i++) {
+            ct.ThrowIfCancellationRequested();
+
+            if (attributes[i].AttributeClass is not null && portalAttributeTypes.Contains(attributes[i].AttributeClass!)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool HasInjectAttribute(IParameterSymbol parameter, INamedTypeSymbol injectAttribute, CancellationToken ct) {
+        var attributes = parameter.GetAttributes();
+        if (attributes.IsDefaultOrEmpty) {
             return false;
         }
 
-        for (var i = 0; i < methodAttributes.Length; i++) {
+        for (var i = 0; i < attributes.Length; i++) {
             ct.ThrowIfCancellationRequested();
 
-            var methodAttribute = methodAttributes[i];
-            if (methodAttribute.AttributeClass is { ContainingNamespace.Name: "Csla" } cslaAttribute && isAttribute(cslaAttribute.Name)) {
+            if (SymbolEqualityComparer.Default.Equals(attributes[i].AttributeClass, injectAttribute)) {
                 return true;
             }
         }

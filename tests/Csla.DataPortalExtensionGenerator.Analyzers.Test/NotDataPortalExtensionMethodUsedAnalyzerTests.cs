@@ -99,6 +99,25 @@ namespace TestNamespace {{
     }
 
     [Fact]
+    public async Task UserTypeInNestedCslaNamespaceMustNotTriggerDPEG1000() {
+        var cslaSource = @"
+namespace Acme.Csla {
+
+    public interface IDataPortal<T> {
+        System.Threading.Tasks.Task<T> FetchAsync();
+    }
+
+    public class Testing {
+        public async System.Threading.Tasks.Task Test1() {
+            IDataPortal<Testing> fooPortal = null!;
+            var x = await fooPortal.FetchAsync();
+        }
+    }
+}";
+        await VerifyCS.VerifyAnalyzerAsync(cslaSource);
+    }
+
+    [Fact]
     public async Task IChildDataPortalUpdateMustNotGetDiagnosticDPEG1000() {
         var cslaSource = @$"
 using Csla;

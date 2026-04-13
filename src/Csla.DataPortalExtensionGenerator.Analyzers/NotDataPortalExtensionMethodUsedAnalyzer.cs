@@ -30,26 +30,40 @@ public sealed class NotDataPortalExtensionMethodUsedAnalyzer : DiagnosticAnalyze
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
 
-        context.RegisterOperationAction(AnalyzeOperation, OperationKind.Invocation);
+        context.RegisterCompilationStartAction(compilationStart => {
+            var compilation = compilationStart.Compilation;
+
+            var dataPortal = CompilationHelper.ResolveType(compilation, "Csla.IDataPortal`1");
+            if (dataPortal is null) {
+                return;
+            }
+
+            var childDataPortal = CompilationHelper.ResolveType(compilation, "Csla.IChildDataPortal`1");
+            if (childDataPortal is null) {
+                return;
+            }
+
+            compilationStart.RegisterOperationAction(ctx => AnalyzeOperation(ctx, dataPortal, childDataPortal), OperationKind.Invocation);
+        });
     }
 
-    private void AnalyzeOperation(OperationAnalysisContext context) {
+    private static void AnalyzeOperation(OperationAnalysisContext context, INamedTypeSymbol dataPortal, INamedTypeSymbol childDataPortal) {
         var invocationExpression = (IInvocationOperation)context.Operation;
         var targetMethod = invocationExpression.TargetMethod;
 
         var methodName = targetMethod.Name;
 
-        string expectedType;
+        INamedTypeSymbol expectedType;
         switch (methodName) {
             case "CreateAsync":
             case "DeleteAsync":
             case "ExecuteAsync":
             case "FetchAsync":
-                expectedType = "IDataPortal";
+                expectedType = dataPortal;
                 break;
             case "CreateChildAsync":
             case "FetchChildAsync":
-                expectedType = "IChildDataPortal";
+                expectedType = childDataPortal;
                 break;
             case "UpdateAsync":
             case "UpdateChildAsync":
@@ -59,17 +73,9 @@ public sealed class NotDataPortalExtensionMethodUsedAnalyzer : DiagnosticAnalyze
 
         context.CancellationToken.ThrowIfCancellationRequested();
 
-        if (targetMethod.ContainingType is not { ContainingNamespace.Name: "Csla" } cslaType) {
+        if (!SymbolEqualityComparer.Default.Equals(targetMethod.ContainingType.OriginalDefinition, expectedType)) {
             return;
         }
-
-        context.CancellationToken.ThrowIfCancellationRequested();
-
-        if (cslaType.Name != expectedType) {
-            return;
-        }
-
-        context.CancellationToken.ThrowIfCancellationRequested();
 
         context.ReportDiagnostic(Diagnostic.Create(_rule, invocationExpression.Syntax.GetLocation(), methodName));
     }

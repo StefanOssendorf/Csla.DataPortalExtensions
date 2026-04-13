@@ -22,6 +22,26 @@ public class Testing : Csla.Core.ICslaObject {{
         await VerifyCS.VerifyAnalyzerAsync(cslaSource);
     }
 
+    [Fact]
+    public async Task UserTypeInNestedCslaNamespaceMustNotTriggerDPEG1001() {
+        var cslaSource = @"
+using Csla;
+
+namespace Acme.Csla {
+
+    public interface IDataPortal<T> {
+    }
+
+    public class Testing : global::Csla.Core.ICslaObject {
+
+        [Fetch]
+        private void Foo(string a, IDataPortal<Testing> portal){
+        }
+    }
+}";
+        await VerifyCS.VerifyAnalyzerAsync(cslaSource);
+    }
+
     [Theory]
     [InlineData("IDataPortal")]
     [InlineData("IChildDataPortal")]
