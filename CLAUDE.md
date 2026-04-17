@@ -84,7 +84,11 @@ Property names are defined in `ConfigConstants.cs`. Generated methods are intent
 
 ## Code style
 
-Conventions are enforced via `.editorconfig`.
+Conventions are enforced via `.editorconfig`. A `pre-commit` git hook in `.githooks/` runs `dotnet format` automatically on every commit. Activate it once per clone with:
+
+```bash
+git config core.hooksPath .githooks
+```
 
 ## Versioning
 
