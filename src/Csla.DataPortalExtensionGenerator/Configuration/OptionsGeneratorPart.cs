@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Configuration;
+
 internal static class OptionsGeneratorPart {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IncrementalValueProvider<GeneratorOptions> GetGeneratorOptions(IncrementalGeneratorInitializationContext context) {

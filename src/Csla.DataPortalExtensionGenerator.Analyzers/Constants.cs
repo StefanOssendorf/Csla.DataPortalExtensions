@@ -1,4 +1,5 @@
 ﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers;
+
 internal static class Constants {
     internal static class DiagnosticId {
         public const string NotDataPortalExtensionMethodUsed = "DPEG1000";

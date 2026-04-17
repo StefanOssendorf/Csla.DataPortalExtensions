@@ -1,6 +1,6 @@
-﻿using Csla;
-using AwesomeAssertions;
+﻿using AwesomeAssertions;
 using AwesomeAssertions.Execution;
+using Csla;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;

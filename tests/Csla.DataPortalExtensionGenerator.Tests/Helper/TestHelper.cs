@@ -1,5 +1,5 @@
-﻿using Csla;
-using AwesomeAssertions;
+﻿using AwesomeAssertions;
+using Csla;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 

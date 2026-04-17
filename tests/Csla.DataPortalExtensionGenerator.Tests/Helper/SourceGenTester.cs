@@ -36,7 +36,7 @@ internal static class SourceGenTester {
             Verifier.Verify(CreateResultFromRun(driver, generatorFilesToIgnore))
                 .UseDirectory(relativeSnapshotPath)
                 .ScrubLinesContaining(StringComparison.Ordinal, ".GeneratedCode(\"Ossendorf.Csla.Dataportal")
-            //.AutoVerify()
+        //.AutoVerify()
         );
     }
 

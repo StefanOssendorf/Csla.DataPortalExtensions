@@ -1,4 +1,5 @@
 ﻿namespace Ossendorf.Csla.DataPortalExtensionGenerator;
+
 internal static class GeneratorHelper {
     public static string VersionString { get; } = typeof(DataPortalExtensionGenerator)
                                                     .Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), true)

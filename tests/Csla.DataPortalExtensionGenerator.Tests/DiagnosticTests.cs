@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Ossendorf.Csla.DataPortalExtensionGenerator.Tests.Helper;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Tests;
+
 public class DiagnosticTests {
 
     private const string ValidExtensionClass = @$"

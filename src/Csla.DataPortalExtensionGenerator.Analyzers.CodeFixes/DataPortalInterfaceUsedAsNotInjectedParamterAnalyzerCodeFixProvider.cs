@@ -44,9 +44,7 @@ public class DataPortalInterfaceUsedAsNotInjectedParamterAnalyzerCodeFixProvider
         );
     }
 
-    private Task<Solution> AddInjectAttribute(CancellationToken ct) {
-        throw new NotImplementedException();
-    }
+    private Task<Solution> AddInjectAttribute(CancellationToken ct) => throw new NotImplementedException();
 
     private async Task<Solution> MakeUppercaseAsync(Document document, TypeDeclarationSyntax typeDecl, CancellationToken cancellationToken) {
         // Compute new uppercase name.

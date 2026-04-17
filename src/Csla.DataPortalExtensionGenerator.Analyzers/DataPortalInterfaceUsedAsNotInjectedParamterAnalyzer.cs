@@ -80,6 +80,7 @@ public sealed class DataPortalInterfaceUsedAsNotInjectedParamterAnalyzer : Diagn
                 builder.Add(type);
             }
         }
+
         return builder.ToImmutable();
     }
 
