@@ -106,6 +106,16 @@ With this added the consuming project the generator picks the values up and adds
 > [!TIP]
 > To avoid wrong method resolution when your CSLA methods have the same name as the operation they perform. E.g. the method name is `Fetch()` for the `[Fetch]` attribute. Use either the prefix or suffix configuration to make them different from the methods provided from `IDataPortal`.
 
+## Contributing
+
+Contributions are welcome. After cloning the repository, activate the pre-commit hook that auto-formats code before each commit:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This runs `dotnet format` automatically so formatting is always consistent.
+
 ### Roadmap
 - Support for generic business objects
 
