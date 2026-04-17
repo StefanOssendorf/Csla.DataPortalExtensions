@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator;
+
 internal static class Parser {
     #region Extension class
 
@@ -81,6 +82,7 @@ internal static class Parser {
                 break;
             }
         }
+
         portalObject = new PortalObject(objectHasPublicModifier, classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
         return true;
     }
@@ -218,6 +220,7 @@ internal static class Parser {
                 }
             }
         }
+
         return false;
     }
 
@@ -232,7 +235,7 @@ internal static class Parser {
 
         return $"{attributeName}Attribute";
     }
-    
+
     private static string ExtractAttributeName(NameSyntax? name) {
         return name switch {
             SimpleNameSyntax ins => ins.Identifier.Text,

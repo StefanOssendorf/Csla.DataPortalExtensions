@@ -236,6 +236,7 @@ internal static class StringBuilderExtensions {
                 builder = ImmutableArray.CreateBuilder<PortalOperationToGenerate>();
                 dict[op.Object] = builder;
             }
+
             builder.Add(op);
         }
 
@@ -243,7 +244,7 @@ internal static class StringBuilderExtensions {
         foreach (var kvp in dict) {
             result[kvp.Key] = kvp.Value.ToImmutable();
         }
+
         return result;
     }
-
 }

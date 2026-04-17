@@ -23,9 +23,7 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
     //[UpdateChild]
     //[DeleteSelf]
     //[DeleteSelfChild]
-    private void Dummy() {
-        _ = this;
-    }
+    private void Dummy() => _ = this;
 
     public static readonly PropertyInfo<int> IdProperty = RegisterProperty<int>(c => c.Id);
     public int Id {
@@ -64,9 +62,7 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
 
     [Delete]
 
-    private void Delete() {
-        _ = this;
-    }
+    private void Delete() => _ = this;
 
     private async Task Krznbf(global::Csla.IDataPortal<CslaBusinessObjectDummy> tmp) {
         _ = tmp;
@@ -76,8 +72,8 @@ internal class CslaBusinessObjectDummy : BusinessBase<CslaBusinessObjectDummy> {
         IChildDataPortal<CslaBusinessObjectDummy> childPortal = null!;
         IDataPortal<global::Demo.Console.CslaBusinessObjectDummy> dataPortal = null!;
 
-        var x  = tmp.Create();
-        
+        var x = tmp.Create();
+
         await dataPortal.FetchAsync();
         //portal.CreateAsync
         //portal.DeleteAsync

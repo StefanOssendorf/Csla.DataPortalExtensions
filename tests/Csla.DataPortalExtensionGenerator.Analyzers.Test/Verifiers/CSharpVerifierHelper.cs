@@ -3,7 +3,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using System;
 using System.Collections.Immutable;
 
-namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test; 
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test;
+
 internal static class CSharpVerifierHelper {
     /// <summary>
     /// By default, the compiler reports diagnostics for nullable reference types at

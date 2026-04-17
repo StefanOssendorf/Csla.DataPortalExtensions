@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Diagnostics;
+
 internal static class NotPartialDiagnostic {
     internal const string Message = $"The target of the {nameof(DataPortalExtensionsAttribute)} must be declared as partial.";
     internal const string Title = "Must be partial";

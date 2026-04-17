@@ -3,7 +3,8 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test; 
+namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test;
+
 public static partial class CSharpAnalyzerVerifier<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new() {
     /// <inheritdoc cref="AnalyzerVerifier{TAnalyzer, TTest, TVerifier}.Diagnostic()"/>

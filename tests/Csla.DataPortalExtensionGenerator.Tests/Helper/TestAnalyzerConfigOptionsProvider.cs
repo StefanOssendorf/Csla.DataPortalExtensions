@@ -14,15 +14,15 @@ internal sealed class TestAnalyzerConfigOptionsProvider : AnalyzerConfigOptionsP
         GlobalOptions = globalOptions;
     }
 
-    public override AnalyzerConfigOptions GetOptions(SyntaxTree tree) 
+    public override AnalyzerConfigOptions GetOptions(SyntaxTree tree)
         => TestAnalyzerConfigOptions.Empty;
-    public override AnalyzerConfigOptions GetOptions(AdditionalText textFile) 
+    public override AnalyzerConfigOptions GetOptions(AdditionalText textFile)
         => TestAnalyzerConfigOptions.Empty;
 
-    public static TestAnalyzerConfigOptionsProvider Create(string key, string value) 
+    public static TestAnalyzerConfigOptionsProvider Create(string key, string value)
         => Create(new[] { KeyValuePair.Create(key, value) });
 
-    public static TestAnalyzerConfigOptionsProvider Create(IEnumerable<KeyValuePair<string,string>> config) 
+    public static TestAnalyzerConfigOptionsProvider Create(IEnumerable<KeyValuePair<string, string>> config)
         => new(new TestAnalyzerConfigOptions(ImmutableDictionary.CreateRange(config))
 );
 }
