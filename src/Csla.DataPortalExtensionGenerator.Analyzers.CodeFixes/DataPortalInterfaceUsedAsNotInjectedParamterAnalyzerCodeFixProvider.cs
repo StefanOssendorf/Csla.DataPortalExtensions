@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 using System.Composition;
 
@@ -29,7 +30,7 @@ public class DataPortalInterfaceUsedAsNotInjectedParamterAnalyzerCodeFixProvider
         context.RegisterCodeFix(
             CodeAction.Create(
                 title: CodeFixResources.DataPortalNotInjected,
-                createChangedSolution: ct => AddInjectAttribute(context, ct),
+                createChangedSolution: ct => AddInjectAttribute(context.Document, diagnostic.Location.SourceSpan, ct),
                 equivalenceKey: nameof(CodeFixResources.DataPortalNotInjected)
             ),
             diagnostic
@@ -38,14 +39,12 @@ public class DataPortalInterfaceUsedAsNotInjectedParamterAnalyzerCodeFixProvider
         return Task.CompletedTask;
     }
 
-    private static async Task<Solution> AddInjectAttribute(CodeFixContext context, CancellationToken ct) {
-        var document = context.Document;
+    private static async Task<Solution> AddInjectAttribute(Document document, TextSpan diagnosticSpan, CancellationToken ct) {
         var root = await document.GetSyntaxRootAsync(ct).ConfigureAwait(false);
         if (root is null) {
             return document.Project.Solution;
         }
 
-        var diagnosticSpan = context.Diagnostics.First().Location.SourceSpan;
         if (root.FindNode(diagnosticSpan) is not ParameterSyntax parameterNode) {
             return document.Project.Solution;
         }

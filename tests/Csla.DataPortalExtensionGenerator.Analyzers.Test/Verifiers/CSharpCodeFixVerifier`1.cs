@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Testing;
 
 namespace Ossendorf.Csla.DataPortalExtensionGenerator.Analyzers.Test;
 
-public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
+public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFix : CodeFixProvider, new() {
     /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.Diagnostic()"/>
